@@ -647,4 +647,243 @@ class WarehouseRouter {
         }));
         return true;
     }
+
+    public function exportPriorityRules($params = []) {
+        $rules = $this->getPriorityRules();
+        $ruleTypeMap = [1 => '区域优先', 2 => '商品优先', 3 => '客户等级', 4 => '活动优先', 5 => '全局通用'];
+        $statusMap = [0 => '禁用', 1 => '启用'];
+
+        $headers = ['规则编码', '规则名称', '规则类型', '优先级', '关联仓库', '描述', '排序', '状态', '规则条件', '规则动作'];
+        $rows = [];
+        foreach ($rules as $r) {
+            $rows[] = [
+                $r['rule_code'],
+                $r['rule_name'],
+                $ruleTypeMap[$r['rule_type']] ?? '未知',
+                $r['priority_level'],
+                $r['warehouse_code'] ?? '全局',
+                $r['description'],
+                $r['sort_order'],
+                $statusMap[$r['status']] ?? '未知',
+                $r['rule_condition'],
+                $r['rule_action'],
+            ];
+        }
+        return ['headers' => $headers, 'rows' => $rows, 'filename' => 'inventory_priority_rules_' . date('YmdHis')];
+    }
+
+    public function exportRouteResult($routeResult) {
+        $headers = ['商品编码', '商品名称', '需求数量', '总可用库存', '是否满足', '仓库编码', '仓库名称', '分配数量', '仓库可用', '距离(km)', '评分', '切换类型', '切换说明'];
+        $rows = [];
+
+        if (!empty($routeResult['results'])) {
+            foreach ($routeResult['results'] as $goodsResult) {
+                $goodsNo = $goodsResult['goods_no'] ?? '';
+                $goodsName = $goodsResult['goods_name'] ?? '';
+                $quantity = $goodsResult['quantity'] ?? 0;
+                $totalAvailable = $goodsResult['total_available'] ?? 0;
+                $allocated = !empty($goodsResult['allocated']) ? '是' : '否';
+
+                if (!empty($goodsResult['allocations'])) {
+                    foreach ($goodsResult['allocations'] as $idx => $alloc) {
+                        $switchLog = $goodsResult['switch_log'][$idx] ?? null;
+                        $switchType = '';
+                        $switchMsg = '';
+                        if ($switchLog) {
+                            $switchType = $switchLog['type'] ?? '';
+                            $switchMsg = $switchLog['message'] ?? '';
+                        }
+                        $rows[] = [
+                            $goodsNo,
+                            $goodsName,
+                            $quantity,
+                            $totalAvailable,
+                            $allocated,
+                            $alloc['warehouse_code'],
+                            $alloc['warehouse_name'],
+                            $alloc['allocate_quantity'],
+                            $alloc['available_quantity'],
+                            $alloc['distance'] ?? '-',
+                            round($alloc['score'] ?? 0),
+                            $this->getSwitchTypeName($switchType),
+                            $switchMsg,
+                        ];
+                    }
+                } else {
+                    $rows[] = [
+                    $goodsNo,
+                    $goodsName,
+                    $quantity,
+                    $totalAvailable,
+                    $allocated,
+                    '',
+                    '',
+                    0,
+                    0,
+                    '',
+                    0,
+                    '',
+                    '无可用库存',
+                ];
+            }
+        }
+        return ['headers' => $headers, 'rows' => $rows, 'filename' => 'route_allocation_result_' . date('YmdHis')];
+    }
+
+    private function getSwitchTypeName($type) {
+        $map = [
+            'allocate' => '分配成功',
+            'switch' => '仓库切换',
+            'skip' => '跳过仓库',
+            'warning' => '异常警告',
+        ];
+        return $map[$type] ?? $type;
+    }
+
+    public function exportInventories($params = []) {
+        $inventories = $this->getInventoriesWithWarehouse();
+        $headers = ['仓库编码', '仓库名称', '商品编码', '商品名称', '总库存', '可用库存', '锁定库存', '预警值', '库存状态', '是否异常', '异常说明'];
+        $rows = [];
+
+        foreach ($inventories as $inv) {
+            $status = '正常';
+            $isAbnormal = '否';
+            $abnormalReason = '';
+
+            if ($inv['available_quantity'] <= 0) {
+                $status = '缺货';
+                $isAbnormal = '是';
+                $abnormalReason = '库存为零，需补货';
+            } elseif ($inv['available_quantity'] <= $inv['warning_quantity']) {
+                $status = '预警';
+                $isAbnormal = '是';
+                $abnormalReason = '库存低于预警值';
+            }
+
+            if ($inv['quantity'] != ($inv['available_quantity'] + $inv['locked_quantity'])) {
+                $isAbnormal = '是';
+                $abnormalReason .= ($abnormalReason ? '；' : '') . '库存数量不一致';
+            }
+
+            $rows[] = [
+                $inv['warehouse_code'],
+                $inv['warehouse_name'],
+                $inv['goods_no'],
+                $inv['goods_name'],
+                $inv['quantity'],
+                $inv['available_quantity'],
+                $inv['locked_quantity'],
+                $inv['warning_quantity'],
+                $status,
+                $isAbnormal,
+                $abnormalReason,
+            ];
+        }
+        return ['headers' => $headers, 'rows' => $rows, 'filename' => 'warehouse_inventories_' . date('YmdHis')];
+    }
+
+    public function checkInventoryConsistency() {
+        $inventories = $this->getInventoriesWithWarehouse();
+        $abnormalItems = [];
+        $warningItems = [];
+        $outOfStockItems = [];
+        $totalItems = 0;
+        $normalItems = 0;
+
+        foreach ($inventories as $inv) {
+            $totalItems++;
+            $abnormal = false;
+            $reasons = [];
+
+            if ($inv['quantity'] != ($inv['available_quantity'] + $inv['locked_quantity'])) {
+                $abnormal = true;
+                $reasons[] = '库存数量不一致：总库存≠可用+锁定';
+            }
+
+            if ($inv['available_quantity'] <= 0) {
+                $abnormal = true;
+                $reasons[] = '缺货';
+                $outOfStockItems[] = array_merge($inv, ['abnormal_reasons' => $reasons]);
+            } elseif ($inv['available_quantity'] <= $inv['warning_quantity']) {
+                $warningItems[] = array_merge($inv, ['abnormal_reasons' => ['低于预警值']]);
+            }
+
+            if ($abnormal) {
+                $abnormalItems[] = array_merge($inv, ['abnormal_reasons' => $reasons]);
+            } else {
+                $normalItems++;
+            }
+        }
+
+        return [
+            'total_items' => $totalItems,
+            'normal_items' => $normalItems,
+            'abnormal_count' => count($abnormalItems),
+            'warning_count' => count($warningItems),
+            'out_of_stock_count' => count($outOfStockItems),
+            'abnormal_items' => $abnormalItems,
+            'warning_items' => $warningItems,
+            'out_of_stock_items' => $outOfStockItems,
+            'check_time' => date('Y-m-d H:i:s'),
+        ];
+    }
+
+    public function getInventoryAlerts() {
+        $result = $this->checkInventoryConsistency();
+        $alerts = [];
+
+        if (!empty($result['out_of_stock_items'])) {
+            $alerts[] = [
+                'type' => 'danger',
+                'level' => '严重',
+                'title' => '缺货告警',
+                'count' => count($result['out_of_stock_count'],
+                'message' => '有 ' . count($result['out_of_stock_count']) . ' 个商品库存为零，需立即补货',
+                'items' => array_slice($result['out_of_stock_items'], 0, 5),
+            ];
+        }
+
+        if (!empty($result['warning_items'])) {
+            $alerts[] = [
+                'type' => 'warning',
+                'level' => '预警',
+                'title' => '库存预警',
+                'count' => count($result['warning_count']),
+                'message' => '有 ' . count($result['warning_count']) . ' 个商品库存低于预警值',
+                'items' => array_slice($result['warning_items'], 0, 5),
+            ];
+        }
+
+        $abnormalCount = 0;
+        $abnormalList = [];
+        foreach ($result['abnormal_items'] as $item) {
+            $hasQtyIssue = false;
+            foreach ($item['abnormal_reasons'] as $reason) {
+                if (strpos($reason, '库存数量不一致') !== false) {
+                    $hasQtyIssue = true;
+                    break;
+                }
+            }
+            if ($hasQtyIssue) {
+                $abnormalCount++;
+                $abnormalList[] = $item;
+            }
+        }
+
+        if ($abnormalCount > 0) {
+            $alerts[] = [
+                'type' => 'error',
+                'level' => '异常',
+                'title' => '库存数据异常',
+                'count' => $abnormalCount,
+                'message' => '有 ' . $abnormalCount . ' 条库存数据不一致，需核对',
+                'items' => array_slice($abnormalList, 0, 5),
+            ];
+        }
+
+        return [
+            'alerts' => $alerts,
+            'summary' => $result,
+        ];
+    }
 }

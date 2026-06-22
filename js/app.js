@@ -1546,5 +1546,9 @@ if (typeof WithholdingView !== 'undefined') {
   app.component('withholding-view', WithholdingView);
 }
 
+if (typeof WarehouseRouting !== 'undefined') {
+  app.component('warehouse-routing', WarehouseRouting);
+}
+
 app.use(ElementPlus);
 app.mount('#app');
