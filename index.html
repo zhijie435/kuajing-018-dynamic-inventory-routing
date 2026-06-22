@@ -3,1093 +3,1111 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>日结算报表汇总系统</title>
+  <title>结算管理中心</title>
   <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <div id="app">
     <div class="container">
-      <div class="header">
+      <div class="app-header">
         <div class="header-left">
-          <h1 class="title">日结算报表汇总</h1>
-          <p class="subtitle">电商订单库存后台 - 结算管理中心</p>
+          <h1 class="title">结算管理中心</h1>
+          <p class="subtitle">电商订单库存后台 - 预扣金额公式计算系统</p>
         </div>
         <div class="header-right">
-          <el-statistic title="今日日期" :value="todayDate" style="margin-right: 30px;"></el-statistic>
+          <el-statistic title="今日日期" :value="todayDate" />
         </div>
       </div>
 
-      <div class="nav-tabs">
-        <el-tabs v-model="activeTab" @tab-change="handleTabChange">
-          <el-tab-pane label="日结算报表" name="daily">
-            <el-icon><Document /></el-icon>
-            <span>日结算报表</span>
-          </el-tab-pane>
-          <el-tab-pane label="预扣明细管理" name="withholding">
-            <el-icon><Tickets /></el-icon>
-            <span>预扣明细管理</span>
-          </el-tab-pane>
-          <el-tab-pane label="资金流水管理" name="fundflow">
-            <el-icon><Wallet /></el-icon>
-            <span>资金流水管理</span>
-          </el-tab-pane>
-        </el-tabs>
-      </div>
+      <el-tabs v-model="activeTab" class="main-tabs" @tab-change="handleTabChange">
+        <el-tab-pane label="日结算报表" name="daily">
+          <span class="tab-label"><el-icon><Document /></el-icon> 日结算报表</span>
+        </el-tab-pane>
+        <el-tab-pane label="预扣公式管理" name="formula">
+          <span class="tab-label"><el-icon><Calculator /></el-icon> 预扣公式管理</span>
+        </el-tab-pane>
+        <el-tab-pane label="预扣明细管理" name="withholding">
+          <span class="tab-label"><el-icon><Tickets /></el-icon> 预扣明细管理</span>
+        </el-tab-pane>
+        <el-tab-pane label="资金流水管理" name="fundflow">
+          <span class="tab-label"><el-icon><Wallet /></el-icon> 资金流水管理</span>
+        </el-tab-pane>
+      </el-tabs>
 
       <div v-show="activeTab === 'daily'">
-        <div class="summary-cards">
-          <el-row :gutter="20">
-            <el-col :span="6">
-              <div class="summary-card">
-                <div class="card-icon icon-1">
-                  <el-icon><Document /></el-icon>
+          <div class="summary-cards">
+            <el-row :gutter="20">
+              <el-col :span="6">
+                <div class="summary-card">
+                  <div class="card-icon icon-1">
+                    <el-icon><Document /></el-icon>
+                  </div>
+                  <div class="card-content">
+                    <div class="card-label">结算天数</div>
+                    <div class="card-value">{{ summary.total_days || 0 }} 天</div>
+                  </div>
                 </div>
-                <div class="card-content">
-                  <div class="card-label">结算天数</div>
-                  <div class="card-value">{{ summary.total_days || 0 }} 天</div>
+              </el-col>
+              <el-col :span="6">
+                <div class="summary-card">
+                  <div class="card-icon icon-2">
+                    <el-icon><ShoppingCart /></el-icon>
+                  </div>
+                  <div class="card-content">
+                    <div class="card-label">订单总数</div>
+                    <div class="card-value">{{ summary.total_orders || 0 }} 笔</div>
+                  </div>
                 </div>
-              </div>
-            </el-col>
-            <el-col :span="6">
-              <div class="summary-card">
-                <div class="card-icon icon-2">
-                  <el-icon><ShoppingCart /></el-icon>
+              </el-col>
+              <el-col :span="6">
+                <div class="summary-card">
+                  <div class="card-icon icon-3">
+                    <el-icon><Money /></el-icon>
+                  </div>
+                  <div class="card-content">
+                    <div class="card-label">结算总金额</div>
+                    <div class="card-value">¥ {{ formatMoney(summary.total_settlement_amount) }}</div>
+                  </div>
                 </div>
-                <div class="card-content">
-                  <div class="card-label">订单总数</div>
-                  <div class="card-value">{{ summary.total_orders || 0 }} 笔</div>
+              </el-col>
+              <el-col :span="6">
+                <div class="summary-card">
+                  <div class="card-icon icon-4">
+                    <el-icon><Wallet /></el-icon>
+                  </div>
+                  <div class="card-content">
+                    <div class="card-label">净收入总额</div>
+                    <div class="card-value">¥ {{ formatMoney(summary.total_net_amount) }}</div>
+                  </div>
                 </div>
-              </div>
-            </el-col>
-            <el-col :span="6">
-              <div class="summary-card">
-                <div class="card-icon icon-3">
-                  <el-icon><Money /></el-icon>
-                </div>
-                <div class="card-content">
-                  <div class="card-label">结算总金额</div>
-                  <div class="card-value">¥ {{ formatMoney(summary.total_settlement_amount) }}</div>
-                </div>
-              </div>
-            </el-col>
-            <el-col :span="6">
-              <div class="summary-card">
-                <div class="card-icon icon-4">
-                  <el-icon><Wallet /></el-icon>
-                </div>
-                <div class="card-content">
-                  <div class="card-label">净收入总额</div>
-                  <div class="card-value">¥ {{ formatMoney(summary.total_net_amount) }}</div>
-                </div>
-              </div>
-            </el-col>
-          </el-row>
+              </el-col>
+            </el-row>
+          </div>
+
+          <div class="filter-section">
+            <el-form :inline="true" :model="filterForm" class="filter-form">
+              <el-form-item label="结算日期">
+                <el-date-picker
+                  v-model="dateRange"
+                  type="daterange"
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  value-format="YYYY-MM-DD"
+                  style="width: 280px;"
+                />
+              </el-form-item>
+              <el-form-item label="核对状态">
+                <el-select v-model="filterForm.checkStatus" placeholder="全部" clearable style="width: 120px;">
+                  <el-option label="未核对" :value="0"></el-option>
+                  <el-option label="核对通过" :value="1"></el-option>
+                  <el-option label="核对异常" :value="2"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="结算状态">
+                <el-select v-model="filterForm.settlementStatus" placeholder="全部" clearable style="width: 120px;">
+                  <el-option label="待结算" :value="1"></el-option>
+                  <el-option label="已结算" :value="2"></el-option>
+                  <el-option label="已对账" :value="3"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" @click="handleSearch" :icon="Search">查询</el-button>
+                <el-button @click="handleReset" :icon="Refresh">重置</el-button>
+              </el-form-item>
+              <el-form-item style="float: right;">
+                <el-button type="success" @click="handleExportDaily" :icon="Download">导出汇总表</el-button>
+                <el-button type="warning" @click="handleExportDetail" :icon="Download" :disabled="!currentExpandedDate">
+                  导出明细表
+                </el-button>
+              </el-form-item>
+            </el-form>
+          </div>
+
+          <div class="table-section">
+            <el-table
+              :data="tableData"
+              style="width: 100%"
+              v-loading="loading"
+              :expand-row-keys="expandRowKeys"
+              @expand-change="handleExpandChange"
+              row-key="id"
+              border
+            >
+              <el-table-column type="expand" width="50">
+                <template #default="props">
+                  <div class="detail-panel">
+                    <div class="detail-header">
+                      <div class="detail-title">
+                        <el-icon><Tickets /></el-icon>
+                        <span>{{ props.row.settlement_date }} 结算明细</span>
+                      </div>
+                      <div class="detail-summary">
+                        <span class="summary-item">明细数量：<b>{{ detailSummary.detail_count || 0 }}</b> 条</span>
+                        <span class="summary-item">商品数量：<b>{{ detailSummary.total_quantity || 0 }}</b> 件</span>
+                        <span class="summary-item">结算金额：<b style="color: #f56c6c;">¥ {{ formatMoney(detailSummary.total_settlement_amount) }}</b></span>
+                        <span class="summary-item">净收入：<b style="color: #67c23a;">¥ {{ formatMoney(detailSummary.total_net_amount) }}</b></span>
+                      </div>
+                    </div>
+                    <el-table
+                      :data="detailData"
+                      size="small"
+                      style="width: 100%"
+                      v-loading="detailLoading"
+                      border
+                    >
+                      <el-table-column prop="order_no" label="订单编号" width="180" />
+                      <el-table-column prop="goods_no" label="商品编号" width="140" />
+                      <el-table-column prop="goods_name" label="商品名称" min-width="200" show-overflow-tooltip />
+                      <el-table-column prop="quantity" label="数量" width="80" align="center" />
+                      <el-table-column prop="unit_price" label="单价" width="100" align="right">
+                        <template #default="{ row }">¥ {{ formatMoney(row.unit_price) }}</template>
+                      </el-table-column>
+                      <el-table-column prop="order_amount" label="订单金额" width="110" align="right">
+                        <template #default="{ row }">¥ {{ formatMoney(row.order_amount) }}</template>
+                      </el-table-column>
+                      <el-table-column prop="discount_amount" label="优惠金额" width="100" align="right">
+                        <template #default="{ row }">-¥ {{ formatMoney(row.discount_amount) }}</template>
+                      </el-table-column>
+                      <el-table-column prop="settlement_amount" label="结算金额" width="110" align="right">
+                        <template #default="{ row }">
+                          <span style="color: #f56c6c; font-weight: bold;">¥ {{ formatMoney(row.settlement_amount) }}</span>
+                        </template>
+                      </el-table-column>
+                      <el-table-column prop="commission_fee" label="手续费" width="90" align="right">
+                        <template #default="{ row }">-¥ {{ formatMoney(row.commission_fee) }}</template>
+                      </el-table-column>
+                      <el-table-column prop="net_amount" label="净收入" width="110" align="right">
+                        <template #default="{ row }">
+                          <span style="color: #67c23a; font-weight: bold;">¥ {{ formatMoney(row.net_amount) }}</span>
+                        </template>
+                      </el-table-column>
+                      <el-table-column prop="settlement_type" label="类型" width="90" align="center">
+                        <template #default="{ row }">
+                          <el-tag :type="getSettlementTypeTag(row.settlement_type)" size="small">
+                            {{ getSettlementTypeName(row.settlement_type) }}
+                          </el-tag>
+                        </template>
+                      </el-table-column>
+                      <el-table-column prop="settlement_status" label="状态" width="90" align="center">
+                        <template #default="{ row }">
+                          <el-tag :type="getStatusTag(row.settlement_status)" size="small">
+                            {{ getStatusName(row.settlement_status) }}
+                          </el-tag>
+                        </template>
+                      </el-table-column>
+                      <el-table-column prop="remark" label="备注" min-width="120" show-overflow-tooltip />
+                    </el-table>
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column type="index" label="序号" width="60" align="center" />
+              <el-table-column prop="settlement_date" label="结算日期" width="120" align="center" sortable>
+                <template #default="{ row }">
+                  <span style="font-weight: 500;">{{ row.settlement_date }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column prop="order_count" label="订单数量" width="100" align="center" sortable />
+              <el-table-column prop="goods_count" label="商品数量" width="100" align="center" sortable />
+              <el-table-column prop="total_order_amount" label="订单总金额" width="130" align="right" sortable>
+                <template #default="{ row }">¥ {{ formatMoney(row.total_order_amount) }}</template>
+              </el-table-column>
+              <el-table-column prop="total_discount_amount" label="优惠总金额" width="120" align="right" sortable>
+                <template #default="{ row }">
+                  <span style="color: #e6a23c;">-¥ {{ formatMoney(row.total_discount_amount) }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column prop="total_settlement_amount" label="结算总金额" width="130" align="right" sortable>
+                <template #default="{ row }">
+                  <span style="color: #f56c6c; font-weight: bold;">¥ {{ formatMoney(row.total_settlement_amount) }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column prop="total_commission_fee" label="手续费总额" width="110" align="right" sortable>
+                <template #default="{ row }">
+                  <span style="color: #e6a23c;">-¥ {{ formatMoney(row.total_commission_fee) }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column prop="total_net_amount" label="净收入总额" width="130" align="right" sortable>
+                <template #default="{ row }">
+                  <span style="color: #67c23a; font-weight: bold;">¥ {{ formatMoney(row.total_net_amount) }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column prop="check_status" label="核对状态" width="100" align="center">
+                <template #default="{ row }">
+                  <el-tag :type="getCheckStatusTag(row.check_status)" size="small">
+                    {{ getCheckStatusName(row.check_status) }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column label="操作" width="160" fixed="right" align="center">
+                <template #default="{ row }">
+                  <el-button type="primary" link size="small" @click="openCheck(row)">核对</el-button>
+                  <el-button type="info" link size="small" @click="handleExportSingle(row)">导出</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+
+            <div class="pagination">
+              <el-pagination
+                v-model:current-page="currentPage"
+                v-model:page-size="pageSize"
+                :page-sizes="[10, 20, 50, 100]"
+                :total="total"
+                layout="total, sizes, prev, pager, next, jumper"
+                background
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+              />
+            </div>
+          </div>
         </div>
 
+      </div>
+
+      <div v-show="activeTab === 'formula'">
         <div class="filter-section">
-          <el-form :inline="true" :model="filterForm" class="filter-form">
-            <el-form-item label="结算日期">
-              <el-date-picker
-                v-model="dateRange"
-                type="daterange"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                value-format="YYYY-MM-DD"
-                style="width: 280px;"
-              />
+          <el-form :inline="true" :model="formulaFilter" class="filter-form">
+            <el-form-item label="关键词">
+              <el-input v-model="formulaFilter.keyword" placeholder="公式名称/编码" clearable style="width: 200px;" />
             </el-form-item>
-            <el-form-item label="核对状态">
-              <el-select v-model="filterForm.checkStatus" placeholder="全部" clearable style="width: 120px;">
-                <el-option label="未核对" :value="0"></el-option>
-                <el-option label="核对通过" :value="1"></el-option>
-                <el-option label="核对异常" :value="2"></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="结算状态">
-              <el-select v-model="filterForm.settlementStatus" placeholder="全部" clearable style="width: 120px;">
-                <el-option label="待结算" :value="1"></el-option>
-                <el-option label="已结算" :value="2"></el-option>
-                <el-option label="已对账" :value="3"></el-option>
+            <el-form-item label="状态">
+              <el-select v-model="formulaFilter.is_enabled" placeholder="全部" clearable style="width: 120px;">
+                <el-option label="启用" :value="1"></el-option>
+                <el-option label="禁用" :value="0"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="handleSearch" :icon="Search">查询</el-button>
-              <el-button @click="handleReset" :icon="Refresh">重置</el-button>
+              <el-button type="primary" @click="fetchFormulaList" :icon="Search">查询</el-button>
+              <el-button @click="resetFormulaFilter" :icon="Refresh">重置</el-button>
             </el-form-item>
             <el-form-item style="float: right;">
-              <el-button type="success" @click="handleExportDaily" :icon="Download">导出汇总表</el-button>
-              <el-button type="warning" @click="handleExportDetail" :icon="Download" :disabled="!currentExpandedDate">
-                导出明细表
-              </el-button>
+              <el-button type="success" @click="openFormulaCreate" :icon="Plus">新增公式</el-button>
             </el-form-item>
           </el-form>
         </div>
 
         <div class="table-section">
           <el-table
-            :data="tableData"
+            :data="formulaList"
             style="width: 100%"
-            v-loading="loading"
-            :expand-row-keys="expandRowKeys"
-            @expand-change="handleExpandChange"
-            row-key="id"
+            v-loading="formulaLoading"
             border
           >
-            <el-table-column type="expand" width="50">
-              <template #default="props">
-                <div class="detail-panel">
-                  <div class="detail-header">
-                    <div class="detail-title">
-                      <el-icon><Tickets /></el-icon>
-                      <span>{{ props.row.settlement_date }} 结算明细</span>
-                    </div>
-                    <div class="detail-summary">
-                      <span class="summary-item">明细数量：<b>{{ detailSummary.detail_count || 0 }}</b> 条</span>
-                      <span class="summary-item">商品数量：<b>{{ detailSummary.total_quantity || 0 }}</b> 件</span>
-                      <span class="summary-item">结算金额：<b style="color: #f56c6c;">¥ {{ formatMoney(detailSummary.total_settlement_amount) }}</b></span>
-                      <span class="summary-item">净收入：<b style="color: #67c23a;">¥ {{ formatMoney(detailSummary.total_net_amount) }}</b></span>
-                    </div>
-                  </div>
-                  <el-table
-                    :data="detailData"
-                    size="small"
-                    style="width: 100%"
-                    v-loading="detailLoading"
-                    border
-                  >
-                    <el-table-column prop="order_no" label="订单编号" width="180" />
-                    <el-table-column prop="goods_no" label="商品编号" width="140" />
-                    <el-table-column prop="goods_name" label="商品名称" min-width="200" show-overflow-tooltip />
-                    <el-table-column prop="quantity" label="数量" width="80" align="center" />
-                    <el-table-column prop="unit_price" label="单价" width="100" align="right">
-                      <template #default="{ row }">¥ {{ formatMoney(row.unit_price) }}</template>
-                    </el-table-column>
-                    <el-table-column prop="order_amount" label="订单金额" width="110" align="right">
-                      <template #default="{ row }">¥ {{ formatMoney(row.order_amount) }}</template>
-                    </el-table-column>
-                    <el-table-column prop="discount_amount" label="优惠金额" width="100" align="right">
-                      <template #default="{ row }">-¥ {{ formatMoney(row.discount_amount) }}</template>
-                    </el-table-column>
-                    <el-table-column prop="settlement_amount" label="结算金额" width="110" align="right">
-                      <template #default="{ row }">
-                        <span style="color: #f56c6c; font-weight: bold;">¥ {{ formatMoney(row.settlement_amount) }}</span>
-                      </template>
-                    </el-table-column>
-                    <el-table-column prop="commission_fee" label="手续费" width="90" align="right">
-                      <template #default="{ row }">-¥ {{ formatMoney(row.commission_fee) }}</template>
-                    </el-table-column>
-                    <el-table-column prop="net_amount" label="净收入" width="110" align="right">
-                      <template #default="{ row }">
-                        <span style="color: #67c23a; font-weight: bold;">¥ {{ formatMoney(row.net_amount) }}</span>
-                      </template>
-                    </el-table-column>
-                    <el-table-column prop="settlement_type" label="类型" width="90" align="center">
-                      <template #default="{ row }">
-                        <el-tag :type="getSettlementTypeTag(row.settlement_type)" size="small">
-                          {{ getSettlementTypeName(row.settlement_type) }}
-                        </el-tag>
-                      </template>
-                    </el-table-column>
-                    <el-table-column prop="settlement_status" label="状态" width="90" align="center">
-                      <template #default="{ row }">
-                        <el-tag :type="getStatusTag(row.settlement_status)" size="small">
-                          {{ getStatusName(row.settlement_status) }}
-                        </el-tag>
-                      </template>
-                    </el-table-column>
-                    <el-table-column prop="remark" label="备注" min-width="120" show-overflow-tooltip />
-                  </el-table>
-                </div>
-              </template>
-            </el-table-column>
             <el-table-column type="index" label="序号" width="60" align="center" />
-            <el-table-column prop="settlement_date" label="结算日期" width="120" align="center" sortable>
+            <el-table-column prop="formula_code" label="公式编码" width="160" />
+            <el-table-column prop="formula_name" label="公式名称" width="200" />
+            <el-table-column prop="formula" label="公式表达式" min-width="250">
               <template #default="{ row }">
-                <span style="font-weight: 500;">{{ row.settlement_date }}</span>
+                <code class="formula-code">{{ row.formula }}</code>
               </template>
             </el-table-column>
-            <el-table-column prop="order_count" label="订单数量" width="100" align="center" sortable />
-            <el-table-column prop="goods_count" label="商品数量" width="100" align="center" sortable />
-            <el-table-column prop="total_order_amount" label="订单总金额" width="130" align="right" sortable>
-              <template #default="{ row }">¥ {{ formatMoney(row.total_order_amount) }}</template>
-            </el-table-column>
-            <el-table-column prop="total_discount_amount" label="优惠总金额" width="120" align="right" sortable>
+            <el-table-column prop="description" label="描述" min-width="180" show-overflow-tooltip />
+            <el-table-column label="变量定义" min-width="200">
               <template #default="{ row }">
-                <span style="color: #e6a23c;">-¥ {{ formatMoney(row.total_discount_amount) }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="total_settlement_amount" label="结算总金额" width="130" align="right" sortable>
-              <template #default="{ row }">
-                <span style="color: #f56c6c; font-weight: bold;">¥ {{ formatMoney(row.total_settlement_amount) }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="total_commission_fee" label="手续费总金额" width="120" align="right" sortable>
-              <template #default="{ row }">-¥ {{ formatMoney(row.total_commission_fee) }}</template>
-            </el-table-column>
-            <el-table-column prop="total_net_amount" label="净收入总额" width="130" align="right" sortable>
-              <template #default="{ row }">
-                <span style="color: #67c23a; font-weight: bold;">¥ {{ formatMoney(row.total_net_amount) }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="refund_count" label="退款笔数" width="90" align="center" sortable />
-            <el-table-column prop="refund_amount" label="退款金额" width="110" align="right" sortable>
-              <template #default="{ row }">
-                <span v-if="row.refund_amount > 0" style="color: #f56c6c;">-¥ {{ formatMoney(row.refund_amount) }}</span>
+                <div v-if="row.variables && row.variables.length > 0">
+                  <el-tag size="small" v-for="v in row.variables" :key="v.name" style="margin: 2px;">
+                    {{ v.label }} ({{ v.name }})
+                  </el-tag>
+                </div>
                 <span v-else>-</span>
               </template>
             </el-table-column>
-            <el-table-column prop="settlement_status" label="结算状态" width="100" align="center">
+            <el-table-column prop="is_enabled" label="状态" width="100" align="center">
               <template #default="{ row }">
-                <el-tag :type="getSettleStatusTag(row.settlement_status)" size="small">
-                  {{ getSettleStatusName(row.settlement_status) }}
+                <el-tag :type="row.is_enabled === 1 ? 'success' : 'info'" size="small">
+                  {{ row.is_enabled === 1 ? '启用' : '禁用' }}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="check_status" label="核对状态" width="100" align="center">
+            <el-table-column prop="created_at" label="创建时间" width="160" align="center" />
+            <el-table-column label="操作" width="180" fixed="right" align="center">
               <template #default="{ row }">
-                <el-tag :type="getCheckStatusTag(row.check_status)" size="small">
-                  {{ getCheckStatusName(row.check_status) }}
-                </el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" width="200" fixed="right" align="center">
-              <template #default="{ row }">
-                <el-button type="primary" link size="small" @click="handleViewDetail(row)">
-                  查看明细
-                </el-button>
-                <el-tooltip v-if="row.settlement_status === 1" content="请先完成结算后再核对" placement="top">
-                  <span>
-                    <el-button type="success" link size="small" disabled>核对通过</el-button>
-                  </span>
-                </el-tooltip>
-                <template v-else>
-                  <el-button type="success" link size="small" @click="handleCheck(row, 1)">
-                    核对通过
-                  </el-button>
-                </template>
-                <el-tooltip v-if="row.settlement_status === 1" content="请先完成结算后再核对" placement="top">
-                  <span>
-                    <el-button type="danger" link size="small" disabled>核对异常</el-button>
-                  </span>
-                </el-tooltip>
-                <template v-else>
-                  <el-button type="danger" link size="small" @click="handleCheck(row, 2)">
-                    核对异常
-                  </el-button>
-                </template>
+                <el-button type="primary" link size="small" @click="openFormulaEdit(row)">编辑</el-button>
+                <el-button type="warning" link size="small" @click="openFormulaValidate(row)">验证</el-button>
+                <el-button type="danger" link size="small" @click="deleteFormula(row)">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
 
           <div class="pagination">
             <el-pagination
-              v-model:current-page="currentPage"
-              v-model:page-size="pageSize"
+              v-model:current-page="formulaPage"
+              v-model:page-size="formulaPageSize"
               :page-sizes="[10, 20, 50, 100]"
-              :total="total"
+              :total="formulaTotal"
               layout="total, sizes, prev, pager, next, jumper"
               background
-              @size-change="handleSizeChange"
-              @current-change="handleCurrentChange"
+              @size-change="handleFormulaSizeChange"
+              @current-change="handleFormulaPageChange"
             />
           </div>
         </div>
       </div>
 
       <div v-show="activeTab === 'withholding'">
-        <div class="summary-cards">
-          <el-row :gutter="20">
-            <el-col :span="4" v-for="(label, status) in withholdingStatusLabels" :key="status">
-              <div class="summary-card">
-                <div class="card-status-count">
-                  <el-tag :type="withholdingTagTypes[status]" effect="dark">
-                    {{ withholdingStatusStats[status] || 0 }}
-                  </el-tag>
-                </div>
-                <div class="card-content">
-                  <div class="card-label">{{ label }}</div>
-                  <div class="card-value">{{ withholdingStatusStats[status] || 0 }} 条</div>
-                </div>
-              </div>
-            </el-col>
-          </el-row>
-        </div>
+          <div class="filter-section">
+            <el-form :inline="true" :model="withholdingFilter" class="filter-form">
+              <el-form-item label="公式编码">
+                <el-input v-model="withholdingFilter.formula_code" placeholder="请输入公式编码" clearable style="width: 180px;" />
+              </el-form-item>
+              <el-form-item label="订单编号">
+                <el-input v-model="withholdingFilter.order_no" placeholder="请输入订单编号" clearable style="width: 200px;" />
+              </el-form-item>
+              <el-form-item label="状态">
+                <el-select v-model="withholdingFilter.status" placeholder="全部" clearable style="width: 120px;">
+                  <el-option label="待确认" :value="0"></el-option>
+                  <el-option label="已确认" :value="1"></el-option>
+                  <el-option label="已取消" :value="2"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" @click="fetchWithholdingList" :icon="Search">查询</el-button>
+                <el-button @click="resetWithholdingFilter" :icon="Refresh">重置</el-button>
+              </el-form-item>
+              <el-form-item style="float: right;">
+                <el-button type="success" @click="openWithholdingCalc" :icon="Plus">新增预扣</el-button>
+              </el-form-item>
+            </el-form>
+          </div>
 
-        <div class="filter-section">
-          <el-form :inline="true" :model="withholdingFilter" class="filter-form">
-            <el-form-item label="公式编码">
-              <el-input v-model="withholdingFilter.formula_code" placeholder="请输入公式编码" clearable style="width: 180px;" />
-            </el-form-item>
-            <el-form-item label="订单编号">
-              <el-input v-model="withholdingFilter.order_no" placeholder="请输入订单编号" clearable style="width: 180px;" />
-            </el-form-item>
-            <el-form-item label="状态">
-              <el-select v-model="withholdingFilter.status" placeholder="全部" clearable style="width: 140px;">
-                <el-option v-for="(label, status) in withholdingStatusLabels" :key="status" :label="label" :value="status" />
-              </el-select>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="fetchWithholdingList" :icon="Search">查询</el-button>
-              <el-button @click="resetWithholdingFilter" :icon="Refresh">重置</el-button>
-            </el-form-item>
-            <el-form-item style="float: right;">
-              <el-button type="success" @click="openWithholdingCalc" :icon="Plus">新增预扣</el-button>
-            </el-form-item>
-          </el-form>
-        </div>
+          <div class="stats-grid">
+            <div class="stat-card" :class="{ active: withholdingFilter.status === '' }" @click="filterWithholdingByStatus('')">
+              <div class="stat-value">{{ withholdingStatusStats.total || 0 }}</div>
+              <div class="stat-label">全部</div>
+            </div>
+            <div class="stat-card warning" :class="{ active: withholdingFilter.status === 0 }" @click="filterWithholdingByStatus(0)">
+              <div class="stat-value">{{ withholdingStatusStats.pending || 0 }}</div>
+              <div class="stat-label">待确认</div>
+            </div>
+            <div class="stat-card success" :class="{ active: withholdingFilter.status === 1 }" @click="filterWithholdingByStatus(1)">
+              <div class="stat-value">{{ withholdingStatusStats.confirmed || 0 }}</div>
+              <div class="stat-label">已确认</div>
+            </div>
+            <div class="stat-card info" :class="{ active: withholdingFilter.status === 2 }" @click="filterWithholdingByStatus(2)">
+              <div class="stat-value">{{ withholdingStatusStats.cancelled || 0 }}</div>
+              <div class="stat-label">已取消</div>
+            </div>
+          </div>
 
-        <div class="table-section">
-          <el-table
-            :data="withholdingList"
-            style="width: 100%"
-            v-loading="withholdingLoading"
-            border
-          >
-            <el-table-column type="index" label="序号" width="60" align="center" />
-            <el-table-column prop="id" label="ID" width="80" align="center" />
-            <el-table-column prop="formula_code" label="公式编码" width="140" />
-            <el-table-column prop="formula_name" label="公式名称" width="160" />
-            <el-table-column prop="order_no" label="订单编号" width="180" />
-            <el-table-column label="预扣变量" min-width="200">
-              <template #default="{ row }">
-                <div v-if="row.variables && typeof row.variables === 'object'" class="variable-tags">
-                  <el-tag size="small" v-for="(value, key) in row.variables" :key="key" style="margin: 2px;">
+          <div class="table-section">
+            <el-table
+              :data="withholdingList"
+              style="width: 100%"
+              v-loading="withholdingLoading"
+              border
+            >
+              <el-table-column type="index" label="序号" width="60" align="center" />
+              <el-table-column prop="formula_code" label="公式编码" width="120" />
+              <el-table-column prop="formula_name" label="公式名称" width="140" />
+              <el-table-column prop="formula" label="公式" min-width="180" show-overflow-tooltip>
+                <template #default="{ row }">
+                  <code class="formula-badge">{{ row.formula }}</code>
+                </template>
+              </el-table-column>
+              <el-table-column prop="order_no" label="订单编号" width="160" />
+              <el-table-column label="变量" width="200">
+                <template #default="{ row }">
+                  <el-tag
+                    v-for="(value, key) in row.variables"
+                    :key="key"
+                    class="variable-tag"
+                    size="small"
+                    type="info"
+                  >
                     {{ key }}: {{ value }}
                   </el-tag>
-                </div>
-                <span v-else>-</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="result" label="预扣结果" width="120" align="right">
-              <template #default="{ row }">
-                <span style="color: #f56c6c; font-weight: bold;">¥ {{ formatMoney(row.result) }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="status" label="状态" width="100" align="center">
-              <template #default="{ row }">
-                <el-tooltip :content="getWithholdingStatusTip(row.status)" placement="top">
-                  <el-tag :type="row.status_tag_type" size="small" effect="dark">
-                    {{ row.status_label }}
-                  </el-tag>
-                </el-tooltip>
-              </template>
-            </el-table-column>
-            <el-table-column prop="operator" label="操作人" width="100" />
-            <el-table-column prop="created_at" label="创建时间" width="160" align="center" />
-            <el-table-column prop="remark" label="备注" min-width="120" show-overflow-tooltip />
-            <el-table-column label="操作" width="220" fixed="right" align="center">
-              <template #default="{ row }">
-                <el-button type="primary" link size="small" @click="openWithholdingDetail(row)">
-                  详情
-                </el-button>
-                <el-tooltip v-if="row.valid_transitions && row.valid_transitions.length === 0" content="当前状态无可变更操作" placement="top">
-                  <span>
-                    <el-button type="warning" link size="small" disabled>状态变更</el-button>
-                  </span>
-                </el-tooltip>
-                <template v-else>
-                  <el-button type="warning" link size="small" @click="openWithholdingStatusDialog(row)">
-                    状态变更
-                  </el-button>
                 </template>
-                <el-button type="info" link size="small" @click="openWithholdingRemark(row)">
-                  备注
-                </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-
-          <div class="pagination">
-            <el-pagination
-              v-model:current-page="withholdingPage"
-              v-model:page-size="withholdingPageSize"
-              :page-sizes="[10, 20, 50, 100]"
-              :total="withholdingTotal"
-              layout="total, sizes, prev, pager, next, jumper"
-              background
-              @size-change="handleWithholdingSizeChange"
-              @current-change="handleWithholdingPageChange"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div v-show="activeTab === 'fundflow'">
-        <div class="summary-cards">
-          <el-row :gutter="20">
-            <el-col :span="6">
-              <div class="summary-card balance-card">
-                <div class="card-icon icon-balance">
-                  <el-icon><Wallet /></el-icon>
-                </div>
-                <div class="card-content">
-                  <div class="card-label">当前余额</div>
-                  <div class="card-value balance-value">¥ {{ formatMoney(fundStats.current_balance) }}</div>
-                </div>
-              </div>
-            </el-col>
-            <el-col :span="6">
-              <div class="summary-card">
-                <div class="card-icon icon-in">
-                  <el-icon><Top /></el-icon>
-                </div>
-                <div class="card-content">
-                  <div class="card-label">累计流入</div>
-                  <div class="card-value" style="color: #67c23a;">¥ {{ formatMoney(fundStats.total_in) }}</div>
-                </div>
-              </div>
-            </el-col>
-            <el-col :span="6">
-              <div class="summary-card">
-                <div class="card-icon icon-out">
-                  <el-icon><Bottom /></el-icon>
-                </div>
-                <div class="card-content">
-                  <div class="card-label">累计流出</div>
-                  <div class="card-value" style="color: #f56c6c;">¥ {{ formatMoney(fundStats.total_out) }}</div>
-                </div>
-              </div>
-            </el-col>
-            <el-col :span="6">
-              <div class="summary-card">
-                <div class="card-icon icon-3">
-                  <el-icon><DataLine /></el-icon>
-                </div>
-                <div class="card-content">
-                  <div class="card-label">流水总数</div>
-                  <div class="card-value">{{ fundTotalCount || 0 }} 笔</div>
-                </div>
-              </div>
-            </el-col>
-          </el-row>
-        </div>
-
-        <div class="filter-section">
-          <el-form :inline="true" :model="fundFilter" class="filter-form">
-            <el-form-item label="状态">
-              <el-select v-model="fundFilter.status" placeholder="全部" clearable style="width: 120px;">
-                <el-option v-for="(label, status) in fundStatusLabels" :key="status" :label="label" :value="status" />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="类型">
-              <el-select v-model="fundFilter.flow_type" placeholder="全部" clearable style="width: 140px;">
-                <el-option v-for="(label, type) in fundTypeLabels" :key="type" :label="label" :value="type" />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="方向">
-              <el-select v-model="fundFilter.direction" placeholder="全部" clearable style="width: 100px;">
-                <el-option label="流入" :value="1" />
-                <el-option label="流出" :value="2" />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="关键词">
-              <el-input v-model="fundFilter.keyword" placeholder="流水号/订单号/备注" clearable style="width: 180px;" />
-            </el-form-item>
-            <el-form-item label="金额范围">
-              <el-input v-model="fundFilter.min_amount" placeholder="最小" style="width: 90px;" />
-              <span style="margin: 0 5px;">-</span>
-              <el-input v-model="fundFilter.max_amount" placeholder="最大" style="width: 90px;" />
-            </el-form-item>
-            <el-form-item label="日期">
-              <el-date-picker
-                v-model="fundDateRange"
-                type="daterange"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                value-format="YYYY-MM-DD"
-                style="width: 260px;"
-              />
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="fetchFundFlowList" :icon="Search">查询</el-button>
-              <el-button @click="resetFundFilter" :icon="Refresh">重置</el-button>
-            </el-form-item>
-          </el-form>
-        </div>
-
-        <div class="table-section">
-          <el-table
-            :data="fundFlowList"
-            style="width: 100%"
-            v-loading="fundLoading"
-            border
-          >
-            <el-table-column type="index" label="序号" width="60" align="center" />
-            <el-table-column prop="flow_no" label="流水号" width="180" />
-            <el-table-column prop="order_no" label="订单编号" width="180" />
-            <el-table-column prop="flow_type" label="类型" width="120">
-              <template #default="{ row }">
-                <el-tag size="small">{{ row.type_label }}</el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column prop="direction" label="方向" width="80" align="center">
-              <template #default="{ row }">
-                <el-tag :type="row.direction === 1 ? 'success' : 'danger'" size="small" effect="dark">
-                  {{ row.direction_label }}
-                </el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column prop="amount" label="金额" width="120" align="right">
-              <template #default="{ row }">
-                <span :style="{ color: row.direction === 1 ? '#67c23a' : '#f56c6c', fontWeight: 'bold' }">
-                  {{ row.direction === 1 ? '+' : '-' }}¥ {{ formatMoney(row.amount) }}
-                </span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="balance" label="余额" width="120" align="right">
-              <template #default="{ row }">
-                <span style="font-weight: 500;">¥ {{ formatMoney(row.balance) }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="status" label="状态" width="100" align="center">
-              <template #default="{ row }">
-                <el-tooltip :content="getFundStatusTip(row.status)" placement="top">
-                  <el-tag :type="row.status_tag_type" size="small" effect="dark">
-                    {{ row.status_label }}
-                  </el-tag>
-                </el-tooltip>
-              </template>
-            </el-table-column>
-            <el-table-column prop="created_at" label="创建时间" width="160" align="center" />
-            <el-table-column prop="remark" label="备注" min-width="120" show-overflow-tooltip />
-            <el-table-column label="操作" width="200" fixed="right" align="center">
-              <template #default="{ row }">
-                <el-button type="primary" link size="small" @click="openFundDetail(row)">
-                  详情
-                </el-button>
-                <el-tooltip v-if="row.valid_transitions && row.valid_transitions.length === 0" content="当前状态无可变更操作" placement="top">
-                  <span>
-                    <el-button type="warning" link size="small" disabled>状态变更</el-button>
-                  </span>
-                </el-tooltip>
-                <template v-else>
-                  <el-button type="warning" link size="small" @click="openFundStatusDialog(row)">
-                    状态变更
-                  </el-button>
-                </template>
-                <el-button type="info" link size="small" @click="openFundRemark(row)">
-                  备注
-                </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-
-          <div class="pagination">
-            <el-pagination
-              v-model:current-page="fundPage"
-              v-model:page-size="fundPageSize"
-              :page-sizes="[10, 20, 50, 100]"
-              :total="fundTotal"
-              layout="total, sizes, prev, pager, next, jumper"
-              background
-              @size-change="handleFundSizeChange"
-              @current-change="handleFundPageChange"
-            />
-          </div>
-        </div>
-      </div>
-
-      <el-dialog
-        v-model="checkDialogVisible"
-        title="结算核对"
-        width="480px"
-        :close-on-click-modal="false"
-        @closed="resetCheckForm"
-      >
-        <el-form ref="checkFormRef" :model="checkForm" :rules="checkFormRules" label-width="100px">
-          <el-form-item label="结算日期">
-            <span style="font-weight: 500;">{{ checkRow.settlement_date }}</span>
-          </el-form-item>
-          <el-form-item label="结算金额">
-            <span style="color: #f56c6c; font-weight: bold;">¥ {{ formatMoney(checkRow.total_settlement_amount) }}</span>
-          </el-form-item>
-          <el-form-item label="当前状态">
-            <el-tag :type="getCheckStatusTag(checkRow.check_status)" size="small">
-              {{ getCheckStatusName(checkRow.check_status) }}
-            </el-tag>
-            <el-tag v-if="checkRow.check_status === 1 || checkRow.check_status === 2"
-                    type="warning" size="small" style="margin-left: 8px;">
-              重新核对
-            </el-tag>
-          </el-form-item>
-          <el-form-item label="核对结果" prop="check_status">
-            <el-radio-group v-model="checkForm.check_status" @change="handleCheckStatusChange">
-              <el-radio :value="1">核对通过</el-radio>
-              <el-radio :value="2">核对异常</el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="核对备注" :prop="checkForm.check_status === 2 ? 'check_remark' : ''">
-            <el-input
-              v-model="checkForm.check_remark"
-              type="textarea"
-              :rows="3"
-              :placeholder="checkForm.check_status === 2 ? '请输入异常原因（必填）' : '请输入核对备注（选填）'"
-              maxlength="200"
-              show-word-limit
-            />
-          </el-form-item>
-        </el-form>
-        <template #footer>
-          <el-button @click="checkDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="submitCheck" :loading="checkLoading">确认核对</el-button>
-        </template>
-      </el-dialog>
-
-      <el-drawer
-        v-model="withholdingDetailVisible"
-        title="预扣明细详情"
-        size="600px"
-        :close-on-click-modal="false"
-      >
-        <div v-if="currentWithholdingDetail" class="detail-drawer">
-          <el-descriptions :column="2" border>
-            <el-descriptions-item label="ID">{{ currentWithholdingDetail.id }}</el-descriptions-item>
-            <el-descriptions-item label="公式编码">{{ currentWithholdingDetail.formula_code }}</el-descriptions-item>
-            <el-descriptions-item label="公式名称">{{ currentWithholdingDetail.formula_name }}</el-descriptions-item>
-            <el-descriptions-item label="订单编号">{{ currentWithholdingDetail.order_no || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="预扣结果">
-              <span style="color: #f56c6c; font-weight: bold;">¥ {{ formatMoney(currentWithholdingDetail.result) }}</span>
-            </el-descriptions-item>
-            <el-descriptions-item label="状态">
-              <el-tag :type="currentWithholdingDetail.status_tag_type" size="small" effect="dark">
-                {{ currentWithholdingDetail.status_label }}
-              </el-tag>
-            </el-descriptions-item>
-            <el-descriptions-item label="操作人">{{ currentWithholdingDetail.operator }}</el-descriptions-item>
-            <el-descriptions-item label="创建时间">{{ currentWithholdingDetail.created_at }}</el-descriptions-item>
-            <el-descriptions-item label="更新时间">{{ currentWithholdingDetail.updated_at }}</el-descriptions-item>
-            <el-descriptions-item label="预扣变量" :span="2">
-              <div v-if="currentWithholdingDetail.variables && typeof currentWithholdingDetail.variables === 'object'" class="variable-tags">
-                <el-tag size="small" v-for="(value, key) in currentWithholdingDetail.variables" :key="key" style="margin: 2px;">
-                  {{ key }}: {{ value }}
-                </el-tag>
-              </div>
-              <span v-else>-</span>
-            </el-descriptions-item>
-            <el-descriptions-item label="备注" :span="2">
-              <div style="white-space: pre-wrap;">{{ currentWithholdingDetail.remark || '-' }}</div>
-            </el-descriptions-item>
-          </el-descriptions>
-
-          <div v-if="currentWithholdingDetail.fund_flows && currentWithholdingDetail.fund_flows.length > 0" class="related-section">
-            <h4>关联资金流水</h4>
-            <el-table :data="currentWithholdingDetail.fund_flows" size="small" border>
-              <el-table-column prop="flow_no" label="流水号" width="180" />
-              <el-table-column prop="flow_type" label="类型" width="100">
-                <template #default="{ row }">{{ row.type_label }}</template>
               </el-table-column>
-              <el-table-column prop="direction" label="方向" width="60" align="center">
+              <el-table-column prop="result" label="预扣金额" width="120" align="right">
                 <template #default="{ row }">
-                  <el-tag :type="row.direction === 1 ? 'success' : 'danger'" size="small">
-                    {{ row.direction_label }}
+                  <span style="color: #f56c6c; font-weight: bold;">¥ {{ formatMoney(row.result) }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column prop="status" label="状态" width="100" align="center">
+                <template #default="{ row }">
+                  <el-tag :type="row.status === 1 ? 'success' : row.status === 2 ? 'info' : 'warning'" size="small">
+                    {{ row.status === 1 ? '已确认' : row.status === 2 ? '已取消' : '待确认' }}
                   </el-tag>
                 </template>
               </el-table-column>
-              <el-table-column prop="amount" label="金额" width="100" align="right">
-                <template #default="{ row }">¥ {{ formatMoney(row.amount) }}</template>
-              </el-table-column>
-              <el-table-column prop="status" label="状态" width="80" align="center">
+              <el-table-column prop="operator" label="操作人" width="100" />
+              <el-table-column prop="created_at" label="创建时间" width="160" align="center" sortable />
+              <el-table-column label="操作" width="200" fixed="right" align="center">
                 <template #default="{ row }">
-                  <el-tag :type="row.status_tag_type" size="small">{{ row.status_label }}</el-tag>
+                  <el-button type="primary" link size="small" @click="openWithholdingDetail(row)">详情</el-button>
+                  <el-button
+                    v-if="row.status === 0"
+                    type="success"
+                    link
+                    size="small"
+                    @click="openWithholdingStatusDialog(row)"
+                  >
+                    确认
+                  </el-button>
+                  <el-button
+                    v-if="row.status === 0"
+                    type="danger"
+                    link
+                    size="small"
+                    @click="openWithholdingRemark(row)"
+                  >
+                    取消
+                  </el-button>
                 </template>
               </el-table-column>
             </el-table>
-          </div>
 
-          <div class="timeline-section">
-            <h4>操作记录</h4>
-            <el-timeline>
-              <el-timeline-item
-                v-for="log in currentWithholdingDetail.operation_logs"
-                :key="log.id"
-                :timestamp="log.created_at"
-                :type="getLogTimelineType(log.action)"
-              >
-                <div class="log-item">
-                  <div class="log-header">
-                    <el-tag size="small" :type="getLogTagType(log.action)">
-                      {{ getLogActionLabel(log.action) }}
-                    </el-tag>
-                    <span class="log-operator">{{ log.username || log.operator || 'system' }}</span>
-                  </div>
-                  <div class="log-content">
-                    <div v-if="log.old_value && log.old_value.status !== undefined" class="log-status-change">
-                      <span class="log-status-old">
-                        {{ log.old_value.status_label || log.old_value.status }}
-                      </span>
-                      <el-icon><ArrowRight /></el-icon>
-                      <span class="log-status-new">
-                        {{ log.new_value.status_label || log.new_value.status }}
-                      </span>
-                    </div>
-                    <div v-if="log.remark" class="log-remark">
-                      备注：{{ log.remark }}
-                    </div>
-                    <div v-if="log.ip" class="log-meta">
-                      IP: {{ log.ip }}
-                    </div>
-                  </div>
-                </div>
-              </el-timeline-item>
-              <el-timeline-item v-if="!currentWithholdingDetail.operation_logs || currentWithholdingDetail.operation_logs.length === 0" type="info">
-                暂无操作记录
-              </el-timeline-item>
-            </el-timeline>
-          </div>
-        </div>
-        <template #footer>
-          <el-button @click="withholdingDetailVisible = false">关闭</el-button>
-          <el-button v-if="currentWithholdingDetail && currentWithholdingDetail.valid_transitions && currentWithholdingDetail.valid_transitions.length > 0"
-                     type="warning" @click="openWithholdingStatusDialog(currentWithholdingDetail)">
-            状态变更
-          </el-button>
-          <el-button type="info" @click="openWithholdingRemark(currentWithholdingDetail)">
-            添加备注
-          </el-button>
-        </template>
-      </el-drawer>
-
-      <el-dialog
-        v-model="withholdingStatusDialogVisible"
-        title="预扣明细状态变更"
-        width="480px"
-        :close-on-click-modal="false"
-        @closed="resetWithholdingStatusForm"
-      >
-        <el-form ref="withholdingStatusFormRef" :model="withholdingStatusForm" :rules="withholdingStatusRules" label-width="100px">
-          <el-form-item label="当前状态">
-            <el-tag :type="currentWithholdingRow.status_tag_type" size="small" effect="dark">
-              {{ currentWithholdingRow.status_label }}
-            </el-tag>
-          </el-form-item>
-          <el-form-item label="目标状态" prop="status">
-            <el-select v-model="withholdingStatusForm.status" placeholder="请选择目标状态" style="width: 100%;">
-              <el-option
-                v-for="status in currentWithholdingRow.valid_transitions"
-                :key="status"
-                :label="withholdingStatusLabels[status]"
-                :value="status"
+            <div class="pagination">
+              <el-pagination
+                v-model:current-page="withholdingPage"
+                v-model:page-size="withholdingPageSize"
+                :page-sizes="[10, 20, 50, 100]"
+                :total="withholdingTotal"
+                layout="total, sizes, prev, pager, next, jumper"
+                background
+                @size-change="handleWithholdingSizeChange"
+                @current-change="handleWithholdingPageChange"
               />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="变更原因" prop="remark">
-            <el-input
-              v-model="withholdingStatusForm.remark"
-              type="textarea"
-              :rows="3"
-              placeholder="请输入变更原因（必填）"
-              maxlength="200"
-              show-word-limit
-            />
-          </el-form-item>
-          <el-form-item label="操作人">
-            <el-input v-model="withholdingStatusForm.operator" placeholder="请输入操作人" />
-          </el-form-item>
-        </el-form>
-        <template #footer>
-          <el-button @click="withholdingStatusDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="submitWithholdingStatus" :loading="withholdingStatusLoading">
-            确认变更
-          </el-button>
-        </template>
-      </el-dialog>
-
-      <el-dialog
-        v-model="withholdingRemarkDialogVisible"
-        title="添加备注"
-        width="420px"
-        :close-on-click-modal="false"
-        @closed="resetWithholdingRemarkForm"
-      >
-        <el-form ref="withholdingRemarkFormRef" :model="withholdingRemarkForm" :rules="withholdingRemarkRules" label-width="80px">
-          <el-form-item label="当前备注">
-            <div style="color: #666; white-space: pre-wrap;">{{ currentWithholdingRow.remark || '（无）' }}</div>
-          </el-form-item>
-          <el-form-item label="新增备注" prop="remark">
-            <el-input
-              v-model="withholdingRemarkForm.remark"
-              type="textarea"
-              :rows="4"
-              placeholder="请输入备注内容（必填）"
-              maxlength="500"
-              show-word-limit
-            />
-          </el-form-item>
-          <el-form-item label="操作人">
-            <el-input v-model="withholdingRemarkForm.operator" placeholder="请输入操作人" />
-          </el-form-item>
-        </el-form>
-        <template #footer>
-          <el-button @click="withholdingRemarkDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="submitWithholdingRemark" :loading="withholdingRemarkLoading">
-            确认添加
-          </el-button>
-        </template>
-      </el-dialog>
-
-      <el-dialog
-        v-model="withholdingCalcDialogVisible"
-        title="新增预扣计算"
-        width="560px"
-        :close-on-click-modal="false"
-        @closed="resetWithholdingCalcForm"
-      >
-        <el-form ref="withholdingCalcFormRef" :model="withholdingCalcForm" :rules="withholdingCalcRules" label-width="100px">
-          <el-form-item label="公式编码" prop="formula_code">
-            <el-select v-model="withholdingCalcForm.formula_code" placeholder="请选择预扣公式" style="width: 100%;" @change="onFormulaChange">
-              <el-option
-                v-for="formula in availableFormulas"
-                :key="formula.formula_code"
-                :label="formula.formula_name + ' (' + formula.formula_code + ')'"
-                :value="formula.formula_code"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="订单编号">
-            <el-input v-model="withholdingCalcForm.order_no" placeholder="请输入订单编号（选填）" />
-          </el-form-item>
-          <el-form-item v-for="varDef in currentFormulaVariables" :key="varDef.name" :label="varDef.label || varDef.name" :prop="'variables.' + varDef.name" :rules="getVariableRule(varDef)">
-            <el-input-number
-              v-model="withholdingCalcForm.variables[varDef.name]"
-              :precision="2"
-              :min="0"
-              :placeholder="varDef.default !== undefined ? '默认: ' + varDef.default : '请输入数值'"
-              style="width: 100%;"
-            />
-          </el-form-item>
-          <el-form-item label="初始状态">
-            <el-select v-model="withholdingCalcForm.initial_status" placeholder="默认：待处理" style="width: 100%;">
-              <el-option label="待处理" :value="0" />
-              <el-option label="已完成" :value="1" />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="操作人" prop="operator">
-            <el-input v-model="withholdingCalcForm.operator" placeholder="请输入操作人" />
-          </el-form-item>
-          <el-form-item label="备注">
-            <el-input
-              v-model="withholdingCalcForm.remark"
-              type="textarea"
-              :rows="2"
-              placeholder="请输入备注（选填）"
-              maxlength="200"
-            />
-          </el-form-item>
-          <el-form-item v-if="previewResult !== null">
-            <div class="preview-result">
-              <span class="preview-label">预扣结果预览：</span>
-              <span class="preview-value">¥ {{ formatMoney(previewResult) }}</span>
             </div>
-          </el-form-item>
-        </el-form>
-        <template #footer>
-          <el-button @click="previewWithholdingCalc" :disabled="!canPreview">预览</el-button>
-          <el-button @click="withholdingCalcDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="submitWithholdingCalc" :loading="withholdingCalcLoading">
-            确认计算
-          </el-button>
-        </template>
-      </el-dialog>
+          </div>
+      </div>
 
-      <el-drawer
-        v-model="fundDetailVisible"
-        title="资金流水详情"
-        size="600px"
-        :close-on-click-modal="false"
-      >
-        <div v-if="currentFundDetail" class="detail-drawer">
-          <el-descriptions :column="2" border>
-            <el-descriptions-item label="流水号">{{ currentFundDetail.flow_no }}</el-descriptions-item>
-            <el-descriptions-item label="订单编号">{{ currentFundDetail.order_no || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="类型">{{ currentFundDetail.type_label }}</el-descriptions-item>
-            <el-descriptions-item label="方向">
-              <el-tag :type="currentFundDetail.direction === 1 ? 'success' : 'danger'" size="small" effect="dark">
-                {{ currentFundDetail.direction_label }}
-              </el-tag>
-            </el-descriptions-item>
-            <el-descriptions-item label="金额">
-              <span :style="{ color: currentFundDetail.direction === 1 ? '#67c23a' : '#f56c6c', fontWeight: 'bold' }">
-                {{ currentFundDetail.direction === 1 ? '+' : '-' }}¥ {{ formatMoney(currentFundDetail.amount) }}
-              </span>
-            </el-descriptions-item>
-            <el-descriptions-item label="余额">
-              <span style="font-weight: 500;">¥ {{ formatMoney(currentFundDetail.balance) }}</span>
-            </el-descriptions-item>
-            <el-descriptions-item label="状态">
-              <el-tag :type="currentFundDetail.status_tag_type" size="small" effect="dark">
-                {{ currentFundDetail.status_label }}
-              </el-tag>
-            </el-descriptions-item>
-            <el-descriptions-item label="创建时间">{{ currentFundDetail.created_at }}</el-descriptions-item>
-            <el-descriptions-item label="更新时间">{{ currentFundDetail.updated_at }}</el-descriptions-item>
-            <el-descriptions-item label="关联预扣明细" :span="2">
-              <div v-if="currentFundDetail.withholding_detail">
-                <el-tag type="info" size="small">ID: {{ currentFundDetail.withholding_detail.id }}</el-tag>
-                <span style="margin-left: 8px;">{{ currentFundDetail.withholding_detail.formula_code }}</span>
-                <el-tag :type="currentFundDetail.withholding_detail.status_tag_type" size="small" style="margin-left: 8px;">
-                  {{ currentFundDetail.withholding_detail.status_label }}
-                </el-tag>
-              </div>
-              <span v-else>-</span>
-            </el-descriptions-item>
-            <el-descriptions-item label="备注" :span="2">
-              <div style="white-space: pre-wrap;">{{ currentFundDetail.remark || '-' }}</div>
-            </el-descriptions-item>
-          </el-descriptions>
+      <div v-show="activeTab === 'fundflow'">
+          <div class="filter-section">
+            <el-form :inline="true" :model="fundFilter" class="filter-form">
+              <el-form-item label="业务编号">
+                <el-input v-model="fundFilter.business_no" placeholder="订单/结算编号" clearable style="width: 200px;" />
+              </el-form-item>
+              <el-form-item label="类型">
+                <el-select v-model="fundFilter.type" placeholder="全部" clearable style="width: 120px;">
+                  <el-option label="收入" :value="1"></el-option>
+                  <el-option label="支出" :value="2"></el-option>
+                  <el-option label="转账" :value="3"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="状态">
+                <el-select v-model="fundFilter.status" placeholder="全部" clearable style="width: 120px;">
+                  <el-option label="待处理" :value="0"></el-option>
+                  <el-option label="已完成" :value="1"></el-option>
+                  <el-option label="已取消" :value="2"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="日期">
+                <el-date-picker
+                  v-model="fundDateRange"
+                  type="daterange"
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  value-format="YYYY-MM-DD"
+                  style="width: 280px;"
+                />
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" @click="fetchFundFlowList" :icon="Search">查询</el-button>
+                <el-button @click="resetFundFilter" :icon="Refresh">重置</el-button>
+              </el-form-item>
+            </el-form>
+          </div>
 
-          <div class="timeline-section">
-            <h4>操作记录</h4>
-            <el-timeline>
-              <el-timeline-item
-                v-for="log in currentFundDetail.operation_logs"
-                :key="log.id"
-                :timestamp="log.created_at"
-                :type="getLogTimelineType(log.action)"
-              >
-                <div class="log-item">
-                  <div class="log-header">
-                    <el-tag size="small" :type="getLogTagType(log.action)">
-                      {{ getLogActionLabel(log.action) }}
-                    </el-tag>
-                    <span class="log-operator">{{ log.username || log.operator || 'system' }}</span>
-                  </div>
-                  <div class="log-content">
-                    <div v-if="log.old_value && log.old_value.status !== undefined" class="log-status-change">
-                      <span class="log-status-old">
-                        {{ log.old_value.status_label || log.old_value.status }}
-                      </span>
-                      <el-icon><ArrowRight /></el-icon>
-                      <span class="log-status-new">
-                        {{ log.new_value.status_label || log.new_value.status }}
-                      </span>
-                    </div>
-                    <div v-if="log.new_value && log.new_value.balance_adjust !== undefined" class="log-balance-adjust">
-                      余额调整：
-                      <span :style="{ color: log.new_value.balance_adjust >= 0 ? '#67c23a' : '#f56c6c' }">
-                        {{ log.new_value.balance_adjust >= 0 ? '+' : '' }}¥ {{ formatMoney(log.new_value.balance_adjust) }}
-                      </span>
-                    </div>
-                    <div v-if="log.remark" class="log-remark">
-                      备注：{{ log.remark }}
-                    </div>
-                    <div v-if="log.ip" class="log-meta">
-                      IP: {{ log.ip }}
-                    </div>
-                  </div>
-                </div>
-              </el-timeline-item>
-              <el-timeline-item v-if="!currentFundDetail.operation_logs || currentFundDetail.operation_logs.length === 0" type="info">
-                暂无操作记录
-              </el-timeline-item>
-            </el-timeline>
+          <div class="stats-grid">
+            <div class="stat-card" :class="{ active: fundFilter.status === '' }" @click="filterFundByStatus('')">
+              <div class="stat-value">{{ fundStatusStats.total || 0 }}</div>
+              <div class="stat-label">全部</div>
+            </div>
+            <div class="stat-card warning" :class="{ active: fundFilter.status === 0 }" @click="filterFundByStatus(0)">
+              <div class="stat-value">{{ fundStatusStats.pending || 0 }}</div>
+              <div class="stat-label">待处理</div>
+            </div>
+            <div class="stat-card success" :class="{ active: fundFilter.status === 1 }" @click="filterFundByStatus(1)">
+              <div class="stat-value">{{ fundStatusStats.completed || 0 }}</div>
+              <div class="stat-label">已完成</div>
+            </div>
+            <div class="stat-card info" :class="{ active: fundFilter.status === 2 }" @click="filterFundByStatus(2)">
+              <div class="stat-value">{{ fundStatusStats.cancelled || 0 }}</div>
+              <div class="stat-label">已取消</div>
+            </div>
+          </div>
+
+          <div class="table-section">
+            <el-table
+              :data="fundFlowList"
+              style="width: 100%"
+              v-loading="fundLoading"
+              border
+            >
+              <el-table-column type="index" label="序号" width="60" align="center" />
+              <el-table-column prop="flow_no" label="流水编号" width="180" />
+              <el-table-column prop="business_no" label="业务编号" width="180" />
+              <el-table-column prop="business_type" label="业务类型" width="120" align="center">
+                <template #default="{ row }">
+                  <el-tag size="small">{{ row.business_type }}</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column prop="type" label="收支类型" width="100" align="center">
+                <template #default="{ row }">
+                  <el-tag :type="row.type === 1 ? 'success' : row.type === 2 ? 'danger' : 'primary'" size="small">
+                    {{ row.type === 1 ? '收入' : row.type === 2 ? '支出' : '转账' }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column prop="amount" label="金额" width="120" align="right">
+                <template #default="{ row }">
+                  <span :style="{ color: row.type === 1 ? '#67c23a' : '#f56c6c', fontWeight: 'bold' }">
+                    {{ row.type === 1 ? '+' : '-' }}¥ {{ formatMoney(row.amount) }}
+                  </span>
+                </template>
+              </el-table-column>
+              <el-table-column prop="balance" label="余额" width="120" align="right">
+                <template #default="{ row }">¥ {{ formatMoney(row.balance) }}</template>
+              </el-table-column>
+              <el-table-column prop="status" label="状态" width="100" align="center">
+                <template #default="{ row }">
+                  <el-tag :type="row.status === 1 ? 'success' : row.status === 2 ? 'info' : 'warning'" size="small">
+                    {{ row.status === 1 ? '已完成' : row.status === 2 ? '已取消' : '待处理' }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column prop="operator" label="操作人" width="100" />
+              <el-table-column prop="remark" label="备注" min-width="150" show-overflow-tooltip />
+              <el-table-column prop="created_at" label="创建时间" width="160" align="center" sortable />
+              <el-table-column label="操作" width="200" fixed="right" align="center">
+                <template #default="{ row }">
+                  <el-button type="primary" link size="small" @click="openFundDetail(row)">详情</el-button>
+                  <el-button
+                    v-if="row.status === 0"
+                    type="success"
+                    link
+                    size="small"
+                    @click="openFundStatusDialog(row)"
+                  >
+                    处理
+                  </el-button>
+                  <el-button
+                    v-if="row.status === 0"
+                    type="danger"
+                    link
+                    size="small"
+                    @click="openFundRemark(row)"
+                  >
+                    取消
+                  </el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+
+            <div class="pagination">
+              <el-pagination
+                v-model:current-page="fundPage"
+                v-model:page-size="fundPageSize"
+                :page-sizes="[10, 20, 50, 100]"
+                :total="fundTotal"
+                layout="total, sizes, prev, pager, next, jumper"
+                background
+                @size-change="handleFundSizeChange"
+                @current-change="handleFundPageChange"
+              />
+            </div>
           </div>
         </div>
-        <template #footer>
-          <el-button @click="fundDetailVisible = false">关闭</el-button>
-          <el-button v-if="currentFundDetail && currentFundDetail.valid_transitions && currentFundDetail.valid_transitions.length > 0"
-                     type="warning" @click="openFundStatusDialog(currentFundDetail)">
-            状态变更
-          </el-button>
-          <el-button type="info" @click="openFundRemark(currentFundDetail)">
-            添加备注
-          </el-button>
-        </template>
-      </el-drawer>
 
-      <el-dialog
-        v-model="fundStatusDialogVisible"
-        title="资金流水状态变更"
-        width="480px"
-        :close-on-click-modal="false"
-        @closed="resetFundStatusForm"
-      >
-        <el-form ref="fundStatusFormRef" :model="fundStatusForm" :rules="fundStatusRules" label-width="100px">
-          <el-form-item label="流水号">
-            <span style="font-weight: 500;">{{ currentFundRow.flow_no }}</span>
-          </el-form-item>
-          <el-form-item label="当前状态">
-            <el-tag :type="currentFundRow.status_tag_type" size="small" effect="dark">
-              {{ currentFundRow.status_label }}
-            </el-tag>
-          </el-form-item>
-          <el-form-item label="当前金额">
-            <span :style="{ color: currentFundRow.direction === 1 ? '#67c23a' : '#f56c6c', fontWeight: 'bold' }">
-              {{ currentFundRow.direction === 1 ? '+' : '-' }}¥ {{ formatMoney(currentFundRow.amount) }}
-            </span>
-          </el-form-item>
-          <el-form-item label="目标状态" prop="status">
-            <el-select v-model="fundStatusForm.status" placeholder="请选择目标状态" style="width: 100%;">
-              <el-option
-                v-for="status in currentFundRow.valid_transitions"
-                :key="status"
-                :label="fundStatusLabels[status]"
-                :value="status"
+        <el-dialog
+          v-model="checkDialogVisible"
+          title="结算核对"
+          width="600px"
+          :close-on-click-modal="false"
+        >
+          <el-form
+            ref="checkFormRef"
+            :model="checkForm"
+            :rules="checkRules"
+            label-width="100px"
+            class="dialog-form"
+          >
+            <el-form-item label="结算日期">
+              <el-input :value="checkRow?.settlement_date" disabled />
+            </el-form-item>
+            <el-form-item label="结算金额">
+              <el-input :value="'¥ ' + formatMoney(checkRow?.total_settlement_amount)" disabled />
+            </el-form-item>
+            <el-form-item label="净收入">
+              <el-input :value="'¥ ' + formatMoney(checkRow?.total_net_amount)" disabled />
+            </el-form-item>
+            <el-form-item label="核对结果" prop="check_status">
+              <el-radio-group v-model="checkForm.check_status">
+                <el-radio :value="1">核对通过</el-radio>
+                <el-radio :value="2">核对异常</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="强制复核">
+              <el-switch v-model="forceRecheck" />
+              <span style="margin-left: 8px; font-size: 12px; color: #909399;">
+                已核对的数据可以强制重新核对
+              </span>
+            </el-form-item>
+            <el-form-item label="核对备注" prop="check_remark">
+              <el-input
+                v-model="checkForm.check_remark"
+                type="textarea"
+                :rows="4"
+                placeholder="请输入核对备注（异常时必填）"
+                maxlength="500"
+                show-word-limit
               />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="变更原因" prop="remark">
-            <el-input
-              v-model="fundStatusForm.remark"
-              type="textarea"
-              :rows="3"
-              placeholder="请输入变更原因（必填）"
-              maxlength="200"
-              show-word-limit
-            />
-          </el-form-item>
-          <el-form-item label="操作人">
-            <el-input v-model="fundStatusForm.operator" placeholder="请输入操作人" />
-          </el-form-item>
-        </el-form>
-        <template #footer>
-          <el-button @click="fundStatusDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="submitFundStatus" :loading="fundStatusLoading">
-            确认变更
-          </el-button>
-        </template>
-      </el-dialog>
+            </el-form-item>
+            <el-form-item label="操作人">
+              <el-input v-model="checkForm.operator" placeholder="请输入操作人" />
+            </el-form-item>
+          </el-form>
+          <template #footer>
+            <el-button @click="checkDialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="submitCheck" :loading="checkLoading">
+              确认核对
+            </el-button>
+          </template>
+        </el-dialog>
 
-      <el-dialog
-        v-model="fundRemarkDialogVisible"
-        title="添加备注"
-        width="420px"
-        :close-on-click-modal="false"
-        @closed="resetFundRemarkForm"
-      >
-        <el-form ref="fundRemarkFormRef" :model="fundRemarkForm" :rules="fundRemarkRules" label-width="80px">
-          <el-form-item label="当前备注">
-            <div style="color: #666; white-space: pre-wrap;">{{ currentFundRow.remark || '（无）' }}</div>
-          </el-form-item>
-          <el-form-item label="新增备注" prop="remark">
-            <el-input
-              v-model="fundRemarkForm.remark"
-              type="textarea"
-              :rows="4"
-              placeholder="请输入备注内容（必填）"
-              maxlength="500"
-              show-word-limit
-            />
-          </el-form-item>
-          <el-form-item label="操作人">
-            <el-input v-model="fundRemarkForm.operator" placeholder="请输入操作人" />
-          </el-form-item>
-        </el-form>
-        <template #footer>
-          <el-button @click="fundRemarkDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="submitFundRemark" :loading="fundRemarkLoading">
-            确认添加
-          </el-button>
-        </template>
-      </el-dialog>
+        <el-drawer
+          v-model="withholdingDetailVisible"
+          title="预扣明细详情"
+          size="600px"
+          :direction="'rtl'"
+        >
+          <div class="drawer-content">
+            <div class="detail-section">
+              <h4>
+                <el-icon><Document /></el-icon>
+                基本信息
+              </h4>
+              <el-descriptions :column="2" border>
+                <el-descriptions-item label="公式编码">{{ currentWithholdingDetail?.formula_code }}</el-descriptions-item>
+                <el-descriptions-item label="公式名称">{{ currentWithholdingDetail?.formula_name }}</el-descriptions-item>
+                <el-descriptions-item label="订单编号">{{ currentWithholdingDetail?.order_no }}</el-descriptions-item>
+                <el-descriptions-item label="预扣金额">
+                  <span style="color: #f56c6c; font-weight: bold;">¥ {{ formatMoney(currentWithholdingDetail?.result) }}</span>
+                </el-descriptions-item>
+                <el-descriptions-item label="状态">
+                  <el-tag :type="currentWithholdingDetail?.status === 1 ? 'success' : currentWithholdingDetail?.status === 2 ? 'info' : 'warning'" size="small">
+                    {{ currentWithholdingDetail?.status === 1 ? '已确认' : currentWithholdingDetail?.status === 2 ? '已取消' : '待确认' }}
+                  </el-tag>
+                </el-descriptions-item>
+                <el-descriptions-item label="操作人">{{ currentWithholdingDetail?.operator }}</el-descriptions-item>
+                <el-descriptions-item label="创建时间" :span="2">{{ currentWithholdingDetail?.created_at }}</el-descriptions-item>
+              </el-descriptions>
+            </div>
+
+            <div class="detail-section">
+              <h4>
+                <el-icon><Calculator /></el-icon>
+                公式信息
+              </h4>
+              <div class="formula-badge" style="margin-bottom: 12px;">{{ currentWithholdingDetail?.formula }}</div>
+              <h4 style="margin-top: 16px;">变量值</h4>
+              <div class="detail-grid">
+                <div class="detail-item" v-for="(value, key) in currentWithholdingDetail?.variables" :key="key">
+                  <span class="detail-label">{{ key }}:</span>
+                  <span class="detail-value">{{ value }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-section" v-if="currentWithholdingDetail?.fund_flow">
+              <h4>
+                <el-icon><Wallet /></el-icon>
+                关联资金流水
+              </h4>
+              <el-descriptions :column="2" border>
+                <el-descriptions-item label="流水编号">{{ currentWithholdingDetail?.fund_flow?.flow_no }}</el-descriptions-item>
+                <el-descriptions-item label="金额">
+                  <span style="color: #f56c6c; font-weight: bold;">-¥ {{ formatMoney(currentWithholdingDetail?.fund_flow?.amount) }}</span>
+                </el-descriptions-item>
+                <el-descriptions-item label="状态">
+                  <el-tag :type="currentWithholdingDetail?.fund_flow?.status === 1 ? 'success' : currentWithholdingDetail?.fund_flow?.status === 2 ? 'info' : 'warning'" size="small">
+                    {{ currentWithholdingDetail?.fund_flow?.status === 1 ? '已完成' : currentWithholdingDetail?.fund_flow?.status === 2 ? '已取消' : '待处理' }}
+                  </el-tag>
+                </el-descriptions-item>
+                <el-descriptions-item label="创建时间">{{ currentWithholdingDetail?.fund_flow?.created_at }}</el-descriptions-item>
+              </el-descriptions>
+            </div>
+
+            <div class="detail-section" v-if="currentWithholdingDetail?.logs && currentWithholdingDetail.logs.length > 0">
+              <h4>
+                <el-icon><DataLine /></el-icon>
+                操作日志
+              </h4>
+              <el-timeline>
+                <el-timeline-item
+                  v-for="log in currentWithholdingDetail?.logs"
+                  :key="log.id"
+                  :timestamp="log.created_at"
+                  :type="log.action === 'confirm' ? 'success' : log.action === 'cancel' ? 'danger' : 'primary'"
+                >
+                  <el-card shadow="never">
+                    <h4 style="margin-bottom: 8px;">{{ log.action === 'confirm' ? '确认预扣' : log.action === 'cancel' ? '取消预扣' : '创建预扣' }}</h4>
+                    <p style="margin: 0; color: #606266;">操作人：{{ log.operator }}</p>
+                    <p v-if="log.remark" style="margin: 8px 0 0 0; color: #909399;">备注：{{ log.remark }}</p>
+                  </el-card>
+                </el-timeline-item>
+              </el-timeline>
+            </div>
+          </div>
+        </el-drawer>
+
+        <el-dialog
+          v-model="withholdingStatusDialogVisible"
+          title="确认预扣"
+          width="500px"
+          :close-on-click-modal="false"
+        >
+          <el-form
+            ref="withholdingStatusFormRef"
+            :model="withholdingStatusForm"
+            :rules="withholdingStatusRules"
+            label-width="100px"
+            class="dialog-form"
+          >
+            <el-form-item label="订单编号">
+              <el-input :value="currentWithholdingRow?.order_no" disabled />
+            </el-form-item>
+            <el-form-item label="预扣金额">
+              <el-input :value="'¥ ' + formatMoney(currentWithholdingRow?.result)" disabled />
+            </el-form-item>
+            <el-form-item label="备注" prop="remark">
+              <el-input
+                v-model="withholdingStatusForm.remark"
+                type="textarea"
+                :rows="3"
+                placeholder="请输入备注"
+                maxlength="500"
+                show-word-limit
+              />
+            </el-form-item>
+            <el-form-item label="操作人" prop="operator">
+              <el-input v-model="withholdingStatusForm.operator" placeholder="请输入操作人" />
+            </el-form-item>
+          </el-form>
+          <template #footer>
+            <el-button @click="withholdingStatusDialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="submitWithholdingStatus" :loading="withholdingStatusLoading">
+              确认
+            </el-button>
+          </template>
+        </el-dialog>
+
+        <el-dialog
+          v-model="withholdingRemarkDialogVisible"
+          title="取消预扣"
+          width="500px"
+          :close-on-click-modal="false"
+        >
+          <el-form
+            ref="withholdingRemarkFormRef"
+            :model="withholdingRemarkForm"
+            :rules="withholdingRemarkRules"
+            label-width="100px"
+            class="dialog-form"
+          >
+            <el-form-item label="订单编号">
+              <el-input :value="currentWithholdingRow?.order_no" disabled />
+            </el-form-item>
+            <el-form-item label="预扣金额">
+              <el-input :value="'¥ ' + formatMoney(currentWithholdingRow?.result)" disabled />
+            </el-form-item>
+            <el-form-item label="取消原因" prop="remark">
+              <el-input
+                v-model="withholdingRemarkForm.remark"
+                type="textarea"
+                :rows="4"
+                placeholder="请输入取消原因（必填）"
+                maxlength="500"
+                show-word-limit
+              />
+            </el-form-item>
+            <el-form-item label="操作人" prop="operator">
+              <el-input v-model="withholdingRemarkForm.operator" placeholder="请输入操作人" />
+            </el-form-item>
+          </el-form>
+          <template #footer>
+            <el-button @click="withholdingRemarkDialogVisible = false">取消</el-button>
+            <el-button type="danger" @click="submitWithholdingRemark" :loading="withholdingRemarkLoading">
+              确认取消
+            </el-button>
+          </template>
+        </el-dialog>
+
+        <el-dialog
+          v-model="withholdingCalcDialogVisible"
+          title="新增预扣计算"
+          width="600px"
+          :close-on-click-modal="false"
+        >
+          <el-form
+            ref="withholdingCalcFormRef"
+            :model="withholdingCalcForm"
+            :rules="withholdingCalcRules"
+            label-width="100px"
+            class="dialog-form"
+          >
+            <el-form-item label="选择公式" prop="formula_code">
+              <el-select
+                v-model="withholdingCalcForm.formula_code"
+                placeholder="请选择预扣公式"
+                style="width: 100%;"
+                @change="onFormulaChange"
+              >
+                <el-option
+                  v-for="item in enabledFormulaList"
+                  :key="item.formula_code"
+                  :label="item.formula_name"
+                  :value="item.formula_code"
+                >
+                  <span>{{ item.formula_name }}</span>
+                  <span style="float: right; color: #8492a6; font-size: 13px;">{{ item.formula_code }}</span>
+                </el-option>
+              </el-select>
+            </el-form-item>
+
+            <el-form-item v-if="currentFormula" label="公式">
+              <code class="formula-badge">{{ currentFormula.formula }}</code>
+            </el-form-item>
+
+            <el-form-item v-if="currentFormulaVariables.length > 0" label="变量值">
+              <div style="width: 100%;">
+                <div
+                  v-for="varName in currentFormulaVariables"
+                  :key="varName"
+                  class="variable-row"
+                >
+                  <span style="width: 100px; color: #606266;">{{ varName }}:</span>
+                  <el-input-number
+                    v-model="withholdingCalcForm.variables[varName]"
+                    :min="0"
+                    :precision="2"
+                    :step="1"
+                    style="flex: 1;"
+                    :controls="false"
+                    @blur="previewWithholdingCalc"
+                  />
+                </div>
+              </div>
+            </el-form-item>
+
+            <el-form-item label="订单编号" prop="order_no">
+              <el-input v-model="withholdingCalcForm.order_no" placeholder="请输入订单编号" />
+            </el-form-item>
+
+            <el-form-item label="初始状态">
+              <el-radio-group v-model="withholdingCalcForm.initial_status">
+                <el-radio :value="null">待确认</el-radio>
+                <el-radio :value="1">直接确认</el-radio>
+              </el-radio-group>
+            </el-form-item>
+
+            <el-form-item label="操作人" prop="operator">
+              <el-input v-model="withholdingCalcForm.operator" placeholder="请输入操作人" />
+            </el-form-item>
+
+            <el-form-item label="备注">
+              <el-input
+                v-model="withholdingCalcForm.remark"
+                type="textarea"
+                :rows="3"
+                placeholder="请输入备注"
+                maxlength="500"
+                show-word-limit
+              />
+            </el-form-item>
+          </el-form>
+
+          <div v-if="previewResult !== null" class="preview-result">
+            <div class="label">预扣金额预览</div>
+            <div class="value">¥ {{ formatMoney(previewResult) }}</div>
+          </div>
+
+          <template #footer>
+            <el-button @click="resetWithholdingCalcForm">重置</el-button>
+            <el-button @click="previewWithholdingCalc" :loading="previewLoading">预览</el-button>
+            <el-button type="primary" @click="submitWithholdingCalc" :loading="withholdingCalcLoading">
+              确认计算
+            </el-button>
+          </template>
+        </el-dialog>
+
+        <el-drawer
+          v-model="fundDetailVisible"
+          title="资金流水详情"
+          size="600px"
+          :direction="'rtl'"
+        >
+          <div class="drawer-content">
+            <div class="detail-section">
+              <h4>
+                <el-icon><Wallet /></el-icon>
+                基本信息
+              </h4>
+              <el-descriptions :column="2" border>
+                <el-descriptions-item label="流水编号">{{ currentFundDetail?.flow_no }}</el-descriptions-item>
+                <el-descriptions-item label="业务编号">{{ currentFundDetail?.business_no }}</el-descriptions-item>
+                <el-descriptions-item label="业务类型">{{ currentFundDetail?.business_type }}</el-descriptions-item>
+                <el-descriptions-item label="收支类型">
+                  <el-tag :type="currentFundDetail?.type === 1 ? 'success' : currentFundDetail?.type === 2 ? 'danger' : 'primary'" size="small">
+                    {{ currentFundDetail?.type === 1 ? '收入' : currentFundDetail?.type === 2 ? '支出' : '转账' }}
+                  </el-tag>
+                </el-descriptions-item>
+                <el-descriptions-item label="金额">
+                  <span :style="{ color: currentFundDetail?.type === 1 ? '#67c23a' : '#f56c6c', fontWeight: 'bold' }">
+                    {{ currentFundDetail?.type === 1 ? '+' : '-' }}¥ {{ formatMoney(currentFundDetail?.amount) }}
+                  </span>
+                </el-descriptions-item>
+                <el-descriptions-item label="余额">¥ {{ formatMoney(currentFundDetail?.balance) }}</el-descriptions-item>
+                <el-descriptions-item label="状态">
+                  <el-tag :type="currentFundDetail?.status === 1 ? 'success' : currentFundDetail?.status === 2 ? 'info' : 'warning'" size="small">
+                    {{ currentFundDetail?.status === 1 ? '已完成' : currentFundDetail?.status === 2 ? '已取消' : '待处理' }}
+                  </el-tag>
+                </el-descriptions-item>
+                <el-descriptions-item label="操作人">{{ currentFundDetail?.operator }}</el-descriptions-item>
+                <el-descriptions-item label="创建时间" :span="2">{{ currentFundDetail?.created_at }}</el-descriptions-item>
+              </el-descriptions>
+            </div>
+
+            <div class="detail-section">
+              <h4>
+                <el-icon><Document /></el-icon>
+                备注信息
+              </h4>
+              <p style="margin: 0; padding: 12px; background: #f5f7fa; border-radius: 6px;">
+                {{ currentFundDetail?.remark || '暂无备注' }}
+              </p>
+            </div>
+
+            <div class="detail-section" v-if="currentFundDetail?.logs && currentFundDetail.logs.length > 0">
+              <h4>
+                <el-icon><DataLine /></el-icon>
+                操作日志
+              </h4>
+              <el-timeline>
+                <el-timeline-item
+                  v-for="log in currentFundDetail?.logs"
+                  :key="log.id"
+                  :timestamp="log.created_at"
+                  :type="log.action === 'complete' ? 'success' : log.action === 'cancel' ? 'danger' : 'primary'"
+                >
+                  <el-card shadow="never">
+                    <h4 style="margin-bottom: 8px;">
+                      {{ log.action === 'complete' ? '完成处理' : log.action === 'cancel' ? '取消流水' : '创建流水' }}
+                    </h4>
+                    <p style="margin: 0; color: #606266;">操作人：{{ log.operator }}</p>
+                    <p v-if="log.remark" style="margin: 8px 0 0 0; color: #909399;">备注：{{ log.remark }}</p>
+                  </el-card>
+                </el-timeline-item>
+              </el-timeline>
+            </div>
+          </div>
+        </el-drawer>
+
+        <el-dialog
+          v-model="fundStatusDialogVisible"
+          title="处理资金流水"
+          width="500px"
+          :close-on-click-modal="false"
+        >
+          <el-form
+            ref="fundStatusFormRef"
+            :model="fundStatusForm"
+            :rules="fundStatusRules"
+            label-width="100px"
+            class="dialog-form"
+          >
+            <el-form-item label="流水编号">
+              <el-input :value="currentFundRow?.flow_no" disabled />
+            </el-form-item>
+            <el-form-item label="金额">
+              <el-input
+                :value="(currentFundRow?.type === 1 ? '+' : '-') + '¥ ' + formatMoney(currentFundRow?.amount)"
+                disabled
+              />
+            </el-form-item>
+            <el-form-item label="处理结果" prop="status">
+              <el-radio-group v-model="fundStatusForm.status">
+                <el-radio :value="1">已完成</el-radio>
+                <el-radio :value="2">取消</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="备注" prop="remark">
+              <el-input
+                v-model="fundStatusForm.remark"
+                type="textarea"
+                :rows="3"
+                placeholder="请输入备注"
+                maxlength="500"
+                show-word-limit
+              />
+            </el-form-item>
+            <el-form-item label="操作人" prop="operator">
+              <el-input v-model="fundStatusForm.operator" placeholder="请输入操作人" />
+            </el-form-item>
+          </el-form>
+          <template #footer>
+            <el-button @click="fundStatusDialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="submitFundStatus" :loading="fundStatusLoading">
+              确认
+            </el-button>
+          </template>
+        </el-dialog>
+
+        <el-dialog
+          v-model="fundRemarkDialogVisible"
+          title="取消资金流水"
+          width="500px"
+          :close-on-click-modal="false"
+        >
+          <el-form
+            ref="fundRemarkFormRef"
+            :model="fundRemarkForm"
+            :rules="fundRemarkRules"
+            label-width="100px"
+            class="dialog-form"
+          >
+            <el-form-item label="流水编号">
+              <el-input :value="currentFundRow?.flow_no" disabled />
+            </el-form-item>
+            <el-form-item label="金额">
+              <el-input
+                :value="(currentFundRow?.type === 1 ? '+' : '-') + '¥ ' + formatMoney(currentFundRow?.amount)"
+                disabled
+              />
+            </el-form-item>
+            <el-form-item label="取消原因" prop="remark">
+              <el-input
+                v-model="fundRemarkForm.remark"
+                type="textarea"
+                :rows="4"
+                placeholder="请输入取消原因（必填）"
+                maxlength="500"
+                show-word-limit
+              />
+            </el-form-item>
+            <el-form-item label="操作人" prop="operator">
+              <el-input v-model="fundRemarkForm.operator" placeholder="请输入操作人" />
+            </el-form-item>
+          </el-form>
+          <template #footer>
+            <el-button @click="fundRemarkDialogVisible = false">取消</el-button>
+            <el-button type="danger" @click="submitFundRemark" :loading="fundRemarkLoading">
+              确认取消
+            </el-button>
+          </template>
+        </el-dialog>
+      </div>
     </div>
   </div>
 
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script src="https://unpkg.com/element-plus"></script>
   <script src="https://unpkg.com/@element-plus/icons-vue"></script>
+  <script src="js/withholding_formula.js"></script>
+  <script src="js/withholding_calculate.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -11,7 +11,17 @@ const app = createApp({
     const checkDialogVisible = ref(false);
 
     const todayDate = ref(new Date().toISOString().split('T')[0]);
-    const activeTab = ref('daily');
+    const activeTab = ref('settlement');
+    const subTab = ref('daily');
+
+    const handleSubTabChange = (tab) => {
+      if (tab === 'withholding') {
+        fetchWithholdingList();
+      } else if (tab === 'fundflow') {
+        fetchFundFlowList();
+        fetchFundStats();
+      }
+    };
 
     const tableData = ref([]);
     const currentPage = ref(1);
@@ -394,7 +404,9 @@ const app = createApp({
     };
 
     const handleTabChange = (tab) => {
-      if (tab === 'withholding') {
+      if (tab === 'daily') {
+        fetchDailyData();
+      } else if (tab === 'withholding') {
         loadWithholdingStatusTypes();
         fetchWithholdingList();
       } else if (tab === 'fundflow') {
@@ -1353,7 +1365,16 @@ const app = createApp({
         endDate.toISOString().split('T')[0],
       ];
 
-      fetchDailyData();
+      if (activeTab.value === 'daily') {
+        fetchDailyData();
+      } else if (activeTab.value === 'withholding') {
+        loadWithholdingStatusTypes();
+        fetchWithholdingList();
+      } else if (activeTab.value === 'fundflow') {
+        loadFundStatusTypes();
+        fetchFundStats();
+        fetchFundFlowList();
+      }
     });
 
     return {
@@ -1504,12 +1525,25 @@ const app = createApp({
       Top: ElementPlusIconsVue.Top,
       Bottom: ElementPlusIconsVue.Bottom,
       DataLine: ElementPlusIconsVue.DataLine,
+      Calculator: ElementPlusIconsVue.Calculator,
+      activeTab,
+      subTab,
+      todayDate,
+      handleSubTabChange,
     };
   },
 });
 
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component);
+}
+
+if (typeof FormulaView !== 'undefined') {
+  app.component('formula-view', FormulaView);
+}
+
+if (typeof WithholdingView !== 'undefined') {
+  app.component('withholding-view', WithholdingView);
 }
 
 app.use(ElementPlus);

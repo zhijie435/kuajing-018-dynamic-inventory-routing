@@ -16,34 +16,34 @@ class WarehouseRouter {
 
     private function initMockData() {
         $this->mockData['warehouses'] = [
-            ['id' => 1, 'warehouse_code' => 'WH001', 'warehouse_name' => '上海中心仓', 'warehouse_type' => 1, 'province' => '上海市', 'city' => '上海市', 'address' => '浦东新区张江高科技园区88号', 'longitude' => 121.5447, 'latitude' => 31.2282, 'is_default' => 1, 'sort_order' => 1, 'status' => 1],
-            ['id' => 2, 'warehouse_code' => 'WH002', 'warehouse_name' => '广州分仓', 'warehouse_type' => 1, 'province' => '广东省', 'city' => '广州市', 'address' => '白云区太和镇物流园A栋', 'longitude' => 113.3245, 'latitude' => 23.1291, 'is_default' => 0, 'sort_order' => 2, 'status' => 1],
-            ['id' => 3, 'warehouse_code' => 'WH003', 'warehouse_name' => '成都分仓', 'warehouse_type' => 1, 'province' => '四川省', 'city' => '成都市', 'address' => '双流区航空港物流中心B区', 'longitude' => 104.0668, 'latitude' => 30.5728, 'is_default' => 0, 'sort_order' => 3, 'status' => 1],
-            ['id' => 4, 'warehouse_code' => 'WH004', 'warehouse_name' => '北京分仓', 'warehouse_type' => 1, 'province' => '北京市', 'city' => '北京市', 'address' => '大兴区亦庄经济开发区C1栋', 'longitude' => 116.4074, 'latitude' => 39.9042, 'is_default' => 0, 'sort_order' => 4, 'status' => 1],
-            ['id' => 5, 'warehouse_code' => 'WH005', 'warehouse_name' => '武汉分仓', 'warehouse_type' => 2, 'province' => '湖北省', 'city' => '武汉市', 'address' => '东西湖区走马岭物流园D栋', 'longitude' => 114.3055, 'latitude' => 30.5928, 'is_default' => 0, 'sort_order' => 5, 'status' => 1],
+            ['id' => 1, 'warehouse_code' => 'WH001', 'warehouse_name' => '上海中心仓', 'warehouse_type' => 1, 'province' => '上海市', 'city' => '上海市', 'district' => '浦东新区', 'address' => '浦东新区张江高科技园区88号', 'contact' => '张经理', 'phone' => '021-50000001', 'longitude' => 121.5447, 'latitude' => 31.2282, 'is_default' => 1, 'sort_order' => 1, 'status' => 1],
+            ['id' => 2, 'warehouse_code' => 'WH002', 'warehouse_name' => '广州分仓', 'warehouse_type' => 1, 'province' => '广东省', 'city' => '广州市', 'district' => '白云区', 'address' => '白云区太和镇物流园A栋', 'contact' => '李经理', 'phone' => '020-80000002', 'longitude' => 113.3245, 'latitude' => 23.1291, 'is_default' => 0, 'sort_order' => 2, 'status' => 1],
+            ['id' => 3, 'warehouse_code' => 'WH003', 'warehouse_name' => '成都分仓', 'warehouse_type' => 1, 'province' => '四川省', 'city' => '成都市', 'district' => '双流区', 'address' => '双流区航空港物流中心B区', 'contact' => '王经理', 'phone' => '028-70000003', 'longitude' => 104.0668, 'latitude' => 30.5728, 'is_default' => 0, 'sort_order' => 3, 'status' => 1],
+            ['id' => 4, 'warehouse_code' => 'WH004', 'warehouse_name' => '北京分仓', 'warehouse_type' => 1, 'province' => '北京市', 'city' => '北京市', 'district' => '大兴区', 'address' => '大兴区亦庄经济开发区C1栋', 'contact' => '赵经理', 'phone' => '010-60000004', 'longitude' => 116.4074, 'latitude' => 39.9042, 'is_default' => 0, 'sort_order' => 4, 'status' => 1],
+            ['id' => 5, 'warehouse_code' => 'WH005', 'warehouse_name' => '武汉分仓', 'warehouse_type' => 2, 'province' => '湖北省', 'city' => '武汉市', 'district' => '东西湖区', 'address' => '东西湖区走马岭物流园D栋', 'contact' => '陈经理', 'phone' => '027-80000005', 'longitude' => 114.3055, 'latitude' => 30.5928, 'is_default' => 0, 'sort_order' => 5, 'status' => 1],
         ];
 
         $this->mockData['inventories'] = [
-            ['warehouse_id' => 1, 'warehouse_code' => 'WH001', 'goods_id' => 1, 'goods_no' => 'SP001', 'goods_name' => '蓝牙耳机Pro', 'quantity' => 500, 'available_quantity' => 480],
-            ['warehouse_id' => 1, 'warehouse_code' => 'WH001', 'goods_id' => 2, 'goods_no' => 'SP002', 'goods_name' => '智能手表S1', 'quantity' => 300, 'available_quantity' => 285],
-            ['warehouse_id' => 1, 'warehouse_code' => 'WH001', 'goods_id' => 3, 'goods_no' => 'SP003', 'goods_name' => '无线充电器', 'quantity' => 800, 'available_quantity' => 780],
-            ['warehouse_id' => 1, 'warehouse_code' => 'WH001', 'goods_id' => 4, 'goods_no' => 'SP004', 'goods_name' => '手机壳套装', 'quantity' => 1200, 'available_quantity' => 1150],
-            ['warehouse_id' => 2, 'warehouse_code' => 'WH002', 'goods_id' => 1, 'goods_no' => 'SP001', 'goods_name' => '蓝牙耳机Pro', 'quantity' => 200, 'available_quantity' => 180],
-            ['warehouse_id' => 2, 'warehouse_code' => 'WH002', 'goods_id' => 2, 'goods_no' => 'SP002', 'goods_name' => '智能手表S1', 'quantity' => 150, 'available_quantity' => 140],
-            ['warehouse_id' => 2, 'warehouse_code' => 'WH002', 'goods_id' => 3, 'goods_no' => 'SP003', 'goods_name' => '无线充电器', 'quantity' => 400, 'available_quantity' => 390],
-            ['warehouse_id' => 2, 'warehouse_code' => 'WH002', 'goods_id' => 4, 'goods_no' => 'SP004', 'goods_name' => '手机壳套装', 'quantity' => 600, 'available_quantity' => 580],
-            ['warehouse_id' => 3, 'warehouse_code' => 'WH003', 'goods_id' => 1, 'goods_no' => 'SP001', 'goods_name' => '蓝牙耳机Pro', 'quantity' => 0, 'available_quantity' => 0],
-            ['warehouse_id' => 3, 'warehouse_code' => 'WH003', 'goods_id' => 2, 'goods_no' => 'SP002', 'goods_name' => '智能手表S1', 'quantity' => 100, 'available_quantity' => 95],
-            ['warehouse_id' => 3, 'warehouse_code' => 'WH003', 'goods_id' => 3, 'goods_no' => 'SP003', 'goods_name' => '无线充电器', 'quantity' => 0, 'available_quantity' => 0],
-            ['warehouse_id' => 3, 'warehouse_code' => 'WH003', 'goods_id' => 4, 'goods_no' => 'SP004', 'goods_name' => '手机壳套装', 'quantity' => 300, 'available_quantity' => 290],
-            ['warehouse_id' => 4, 'warehouse_code' => 'WH004', 'goods_id' => 1, 'goods_no' => 'SP001', 'goods_name' => '蓝牙耳机Pro', 'quantity' => 250, 'available_quantity' => 240],
-            ['warehouse_id' => 4, 'warehouse_code' => 'WH004', 'goods_id' => 2, 'goods_no' => 'SP002', 'goods_name' => '智能手表S1', 'quantity' => 0, 'available_quantity' => 0],
-            ['warehouse_id' => 4, 'warehouse_code' => 'WH004', 'goods_id' => 3, 'goods_no' => 'SP003', 'goods_name' => '无线充电器', 'quantity' => 350, 'available_quantity' => 340],
-            ['warehouse_id' => 4, 'warehouse_code' => 'WH004', 'goods_id' => 4, 'goods_no' => 'SP004', 'goods_name' => '手机壳套装', 'quantity' => 0, 'available_quantity' => 0],
-            ['warehouse_id' => 5, 'warehouse_code' => 'WH005', 'goods_id' => 1, 'goods_no' => 'SP001', 'goods_name' => '蓝牙耳机Pro', 'quantity' => 180, 'available_quantity' => 170],
-            ['warehouse_id' => 5, 'warehouse_code' => 'WH005', 'goods_id' => 2, 'goods_no' => 'SP002', 'goods_name' => '智能手表S1', 'quantity' => 80, 'available_quantity' => 75],
-            ['warehouse_id' => 5, 'warehouse_code' => 'WH005', 'goods_id' => 3, 'goods_no' => 'SP003', 'goods_name' => '无线充电器', 'quantity' => 220, 'available_quantity' => 210],
-            ['warehouse_id' => 5, 'warehouse_code' => 'WH005', 'goods_id' => 4, 'goods_no' => 'SP004', 'goods_name' => '手机壳套装', 'quantity' => 450, 'available_quantity' => 430],
+            ['id' => 1, 'warehouse_id' => 1, 'warehouse_code' => 'WH001', 'goods_id' => 1, 'goods_no' => 'SP001', 'goods_name' => '蓝牙耳机Pro', 'quantity' => 500, 'available_quantity' => 480, 'locked_quantity' => 15, 'warning_quantity' => 50, 'status' => 1],
+            ['id' => 2, 'warehouse_id' => 1, 'warehouse_code' => 'WH001', 'goods_id' => 2, 'goods_no' => 'SP002', 'goods_name' => '智能手表S1', 'quantity' => 300, 'available_quantity' => 285, 'locked_quantity' => 10, 'warning_quantity' => 30, 'status' => 1],
+            ['id' => 3, 'warehouse_id' => 1, 'warehouse_code' => 'WH001', 'goods_id' => 3, 'goods_no' => 'SP003', 'goods_name' => '无线充电器', 'quantity' => 800, 'available_quantity' => 780, 'locked_quantity' => 15, 'warning_quantity' => 80, 'status' => 1],
+            ['id' => 4, 'warehouse_id' => 1, 'warehouse_code' => 'WH001', 'goods_id' => 4, 'goods_no' => 'SP004', 'goods_name' => '手机壳套装', 'quantity' => 1200, 'available_quantity' => 1150, 'locked_quantity' => 40, 'warning_quantity' => 100, 'status' => 1],
+            ['id' => 5, 'warehouse_id' => 2, 'warehouse_code' => 'WH002', 'goods_id' => 1, 'goods_no' => 'SP001', 'goods_name' => '蓝牙耳机Pro', 'quantity' => 200, 'available_quantity' => 180, 'locked_quantity' => 15, 'warning_quantity' => 20, 'status' => 1],
+            ['id' => 6, 'warehouse_id' => 2, 'warehouse_code' => 'WH002', 'goods_id' => 2, 'goods_no' => 'SP002', 'goods_name' => '智能手表S1', 'quantity' => 150, 'available_quantity' => 140, 'locked_quantity' => 5, 'warning_quantity' => 15, 'status' => 1],
+            ['id' => 7, 'warehouse_id' => 2, 'warehouse_code' => 'WH002', 'goods_id' => 3, 'goods_no' => 'SP003', 'goods_name' => '无线充电器', 'quantity' => 400, 'available_quantity' => 390, 'locked_quantity' => 8, 'warning_quantity' => 40, 'status' => 1],
+            ['id' => 8, 'warehouse_id' => 2, 'warehouse_code' => 'WH002', 'goods_id' => 4, 'goods_no' => 'SP004', 'goods_name' => '手机壳套装', 'quantity' => 600, 'available_quantity' => 580, 'locked_quantity' => 15, 'warning_quantity' => 60, 'status' => 1],
+            ['id' => 9, 'warehouse_id' => 3, 'warehouse_code' => 'WH003', 'goods_id' => 1, 'goods_no' => 'SP001', 'goods_name' => '蓝牙耳机Pro', 'quantity' => 0, 'available_quantity' => 0, 'locked_quantity' => 0, 'warning_quantity' => 20, 'status' => 1],
+            ['id' => 10, 'warehouse_id' => 3, 'warehouse_code' => 'WH003', 'goods_id' => 2, 'goods_no' => 'SP002', 'goods_name' => '智能手表S1', 'quantity' => 100, 'available_quantity' => 95, 'locked_quantity' => 3, 'warning_quantity' => 10, 'status' => 1],
+            ['id' => 11, 'warehouse_id' => 3, 'warehouse_code' => 'WH003', 'goods_id' => 3, 'goods_no' => 'SP003', 'goods_name' => '无线充电器', 'quantity' => 0, 'available_quantity' => 0, 'locked_quantity' => 0, 'warning_quantity' => 40, 'status' => 1],
+            ['id' => 12, 'warehouse_id' => 3, 'warehouse_code' => 'WH003', 'goods_id' => 4, 'goods_no' => 'SP004', 'goods_name' => '手机壳套装', 'quantity' => 300, 'available_quantity' => 290, 'locked_quantity' => 8, 'warning_quantity' => 30, 'status' => 1],
+            ['id' => 13, 'warehouse_id' => 4, 'warehouse_code' => 'WH004', 'goods_id' => 1, 'goods_no' => 'SP001', 'goods_name' => '蓝牙耳机Pro', 'quantity' => 250, 'available_quantity' => 240, 'locked_quantity' => 8, 'warning_quantity' => 25, 'status' => 1],
+            ['id' => 14, 'warehouse_id' => 4, 'warehouse_code' => 'WH004', 'goods_id' => 2, 'goods_no' => 'SP002', 'goods_name' => '智能手表S1', 'quantity' => 0, 'available_quantity' => 0, 'locked_quantity' => 0, 'warning_quantity' => 15, 'status' => 1],
+            ['id' => 15, 'warehouse_id' => 4, 'warehouse_code' => 'WH004', 'goods_id' => 3, 'goods_no' => 'SP003', 'goods_name' => '无线充电器', 'quantity' => 350, 'available_quantity' => 340, 'locked_quantity' => 8, 'warning_quantity' => 35, 'status' => 1],
+            ['id' => 16, 'warehouse_id' => 4, 'warehouse_code' => 'WH004', 'goods_id' => 4, 'goods_no' => 'SP004', 'goods_name' => '手机壳套装', 'quantity' => 0, 'available_quantity' => 0, 'locked_quantity' => 0, 'warning_quantity' => 30, 'status' => 1],
+            ['id' => 17, 'warehouse_id' => 5, 'warehouse_code' => 'WH005', 'goods_id' => 1, 'goods_no' => 'SP001', 'goods_name' => '蓝牙耳机Pro', 'quantity' => 180, 'available_quantity' => 170, 'locked_quantity' => 8, 'warning_quantity' => 18, 'status' => 1],
+            ['id' => 18, 'warehouse_id' => 5, 'warehouse_code' => 'WH005', 'goods_id' => 2, 'goods_no' => 'SP002', 'goods_name' => '智能手表S1', 'quantity' => 80, 'available_quantity' => 75, 'locked_quantity' => 3, 'warning_quantity' => 8, 'status' => 1],
+            ['id' => 19, 'warehouse_id' => 5, 'warehouse_code' => 'WH005', 'goods_id' => 3, 'goods_no' => 'SP003', 'goods_name' => '无线充电器', 'quantity' => 220, 'available_quantity' => 210, 'locked_quantity' => 8, 'warning_quantity' => 22, 'status' => 1],
+            ['id' => 20, 'warehouse_id' => 5, 'warehouse_code' => 'WH005', 'goods_id' => 4, 'goods_no' => 'SP004', 'goods_name' => '手机壳套装', 'quantity' => 450, 'available_quantity' => 430, 'locked_quantity' => 15, 'warning_quantity' => 45, 'status' => 1],
         ];
 
         $this->mockData['strategies'] = [
@@ -81,43 +81,57 @@ class WarehouseRouter {
                 }
                 $sql .= " ORDER BY sort_order ASC, id ASC";
                 return $this->db->fetchAll($sql, $params);
-            } catch (Exception $e) {
-            }
+            } catch (Exception $e) {}
         }
         $data = $this->mockData[$table] ?? [];
         foreach ($where as $key => $value) {
             $data = array_filter($data, function($item) use ($key, $value) {
-                return $item[$key] === $value;
+                return ($item[$key] ?? null) === $value;
             });
         }
         return array_values($data);
     }
 
-    private function getInventoriesByGoods($goodsNo) {
+    private function getInventoriesWithWarehouse($where = []) {
         if ($this->db) {
             try {
                 $sql = "SELECT wi.*, w.warehouse_name, w.province, w.city, w.longitude, w.latitude 
                         FROM warehouse_inventories wi 
                         LEFT JOIN warehouses w ON wi.warehouse_id = w.id 
-                        WHERE wi.goods_no = :goods_no AND wi.status = 1 AND w.status = 1";
-                return $this->db->fetchAll($sql, ['goods_no' => $goodsNo]);
-            } catch (Exception $e) {
-            }
+                        WHERE 1=1";
+                $params = [];
+                foreach ($where as $key => $value) {
+                    if ($value === null) {
+                        $sql .= " AND wi.`{$key}` IS NULL";
+                    } else {
+                        $sql .= " AND wi.`{$key}` = :{$key}";
+                        $params[$key] = $value;
+                    }
+                }
+                $sql .= " ORDER BY wi.warehouse_id ASC, wi.goods_id ASC";
+                return $this->db->fetchAll($sql, $params);
+            } catch (Exception $e) {}
         }
-        $inventories = array_filter($this->mockData['inventories'], function($inv) use ($goodsNo) {
-            return $inv['goods_no'] === $goodsNo;
-        });
         $result = [];
-        foreach ($inventories as $inv) {
-            $warehouse = $this->getWarehouseById($inv['warehouse_id']);
-            if ($warehouse) {
-                $result[] = array_merge($inv, [
-                    'warehouse_name' => $warehouse['warehouse_name'],
-                    'province' => $warehouse['province'],
-                    'city' => $warehouse['city'],
-                    'longitude' => $warehouse['longitude'],
-                    'latitude' => $warehouse['latitude'],
-                ]);
+        foreach ($this->mockData['inventories'] as $inv) {
+            $match = true;
+            foreach ($where as $key => $value) {
+                if (($inv[$key] ?? null) !== $value) {
+                    $match = false;
+                    break;
+                }
+            }
+            if ($match) {
+                $warehouse = $this->getWarehouseById($inv['warehouse_id']);
+                if ($warehouse) {
+                    $result[] = array_merge($inv, [
+                        'warehouse_name' => $warehouse['warehouse_name'],
+                        'province' => $warehouse['province'],
+                        'city' => $warehouse['city'],
+                        'longitude' => $warehouse['longitude'],
+                        'latitude' => $warehouse['latitude'],
+                    ]);
+                }
             }
         }
         return $result;
@@ -136,8 +150,7 @@ class WarehouseRouter {
                 $sql = "SELECT * FROM warehouse_routing_strategies WHERE is_default = 1 AND status = 1 LIMIT 1";
                 $result = $this->db->fetchOne($sql);
                 if ($result) return $result;
-            } catch (Exception $e) {
-            }
+            } catch (Exception $e) {}
         }
         foreach ($this->mockData['strategies'] as $s) {
             if ($s['is_default'] == 1) return $s;
@@ -150,8 +163,7 @@ class WarehouseRouter {
             try {
                 $sql = "SELECT * FROM inventory_priority_rules WHERE status = 1 ORDER BY priority_level DESC, sort_order ASC";
                 return $this->db->fetchAll($sql);
-            } catch (Exception $e) {
-            }
+            } catch (Exception $e) {}
         }
         $rules = $this->mockData['priority_rules'];
         usort($rules, function($a, $b) {
@@ -174,4 +186,465 @@ class WarehouseRouter {
              cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
              sin($dLon/2) * sin($dLon/2);
         $c = 2 * atan2(sqrt($a), sqrt(1-$a));
-        return round($earth
+        return round($earthRadius * $c, 2);
+    }
+
+    private function estimateDistance($province1, $province2) {
+        $distances = [
+            '上海市-广东省' => 1210, '上海市-四川省' => 1700, '上海市-北京市' => 1060,
+            '上海市-湖北省' => 690, '广东省-四川省' => 1300, '广东省-北京市' => 1890,
+            '广东省-湖北省' => 870, '四川省-北京市' => 1520, '四川省-湖北省' => 860,
+            '北京市-湖北省' => 1050,
+        ];
+        $key1 = $province1 . '-' . $province2;
+        $key2 = $province2 . '-' . $province1;
+        if (isset($distances[$key1])) return $distances[$key1];
+        if (isset($distances[$key2])) return $distances[$key2];
+        if ($province1 === $province2) return 50;
+        return 1000;
+    }
+
+    public function calculateRoute($params) {
+        $goodsList = $params['goods_list'] ?? [];
+        $province = $params['province'] ?? '';
+        $city = $params['city'] ?? '';
+        $strategyId = $params['strategy_id'] ?? null;
+        $customerLevel = $params['customer_level'] ?? '';
+        $promotionTag = $params['promotion_tag'] ?? '';
+
+        $strategy = null;
+        if ($strategyId) {
+            $strategies = $this->getData('strategies', ['id' => $strategyId]);
+            $strategy = $strategies[0] ?? null;
+        }
+        if (!$strategy) {
+            $strategy = $this->getDefaultStrategy();
+        }
+
+        $priorityRules = $this->getActivePriorityRules();
+
+        $results = [];
+        $totalAvailable = true;
+
+        foreach ($goodsList as $goods) {
+            $goodsNo = $goods['goods_no'] ?? '';
+            $quantity = intval($goods['quantity'] ?? 1);
+
+            $inventories = [];
+            foreach ($this->mockData['inventories'] as $inv) {
+                if ($inv['goods_no'] === $goodsNo && $inv['status'] == 1) {
+                    $warehouse = $this->getWarehouseById($inv['warehouse_id']);
+                    if ($warehouse && $warehouse['status'] == 1) {
+                        $inventories[] = array_merge($inv, [
+                            'warehouse_name' => $warehouse['warehouse_name'],
+                            'province' => $warehouse['province'],
+                            'city' => $warehouse['city'],
+                            'longitude' => $warehouse['longitude'],
+                            'latitude' => $warehouse['latitude'],
+                        ]);
+                    }
+                }
+            }
+
+            if (empty($inventories)) {
+                $results[] = [
+                    'goods_no' => $goodsNo,
+                    'goods_name' => $goods['goods_name'] ?? $goodsNo,
+                    'quantity' => $quantity,
+                    'total_available' => 0,
+                    'allocated' => false,
+                    'allocations' => [],
+                    'switch_log' => [['type' => 'warning', 'message' => "商品 {$goodsNo} 无可用库存"]],
+                ];
+                $totalAvailable = false;
+                continue;
+            }
+
+            $scored = $this->scoreWarehouses($inventories, $strategy, $priorityRules, [
+                'province' => $province,
+                'city' => $city,
+                'customer_level' => $customerLevel,
+                'promotion_tag' => $promotionTag,
+                'goods_no' => $goodsNo,
+            ]);
+
+            $remaining = $quantity;
+            $allocations = [];
+            $switchLog = [];
+
+            foreach ($scored as $item) {
+                if ($remaining <= 0) break;
+
+                $avail = $item['available_quantity'];
+                if ($avail <= 0) {
+                    $switchLog[] = [
+                        'type' => 'skip',
+                        'message' => "{$item['warehouse_name']}({$item['warehouse_code']}) 无可用库存，跳过",
+                    ];
+                    continue;
+                }
+
+                $allocate = min($remaining, $avail);
+                $allocations[] = [
+                    'warehouse_id' => $item['warehouse_id'],
+                    'warehouse_code' => $item['warehouse_code'],
+                    'warehouse_name' => $item['warehouse_name'],
+                    'allocate_quantity' => $allocate,
+                    'available_quantity' => $avail,
+                    'distance' => $item['distance'] ?? null,
+                    'score' => $item['score'] ?? 0,
+                ];
+
+                if ($allocate < $remaining) {
+                    $switchLog[] = [
+                        'type' => 'switch',
+                        'message' => "{$item['warehouse_name']} 库存不足(需{$remaining}，有{$avail})，分配{$allocate}件后切换仓库",
+                    ];
+                } else {
+                    $switchLog[] = [
+                        'type' => 'allocate',
+                        'message' => "{$item['warehouse_name']} 分配{$allocate}件，满足需求",
+                    ];
+                }
+
+                $remaining -= $allocate;
+            }
+
+            $totalAvailForGoods = array_sum(array_column($inventories, 'available_quantity'));
+            $goodsResult = [
+                'goods_no' => $goodsNo,
+                'goods_name' => $inventories[0]['goods_name'] ?? $goodsNo,
+                'quantity' => $quantity,
+                'total_available' => $totalAvailForGoods,
+                'allocated' => $remaining <= 0,
+                'allocations' => $allocations,
+                'switch_log' => $switchLog,
+            ];
+
+            if ($remaining > 0) {
+                $switchLog[] = [
+                    'type' => 'warning',
+                    'message' => "所有仓库库存不足，还差{$remaining}件无法满足",
+                ];
+                $totalAvailable = false;
+            }
+
+            $results[] = $goodsResult;
+        }
+
+        return [
+            'strategy' => $strategy ? [
+                'id' => $strategy['id'],
+                'strategy_code' => $strategy['strategy_code'],
+                'strategy_name' => $strategy['strategy_name'],
+                'strategy_type' => $strategy['strategy_type'],
+            ] : null,
+            'request_params' => $params,
+            'results' => $results,
+            'all_fulfilled' => $totalAvailable,
+            'total_goods' => count($goodsList),
+            'fulfilled_goods' => count(array_filter($results, function($r) { return $r['allocated']; })),
+        ];
+    }
+
+    private function scoreWarehouses($inventories, $strategy, $priorityRules, $context) {
+        $strategyType = $strategy['strategy_type'] ?? 1;
+        $rulesConfig = json_decode($strategy['rules_config'] ?? '{}', true);
+
+        $scored = [];
+        foreach ($inventories as $inv) {
+            $score = 0;
+            $distance = null;
+            $warehouse = $this->getWarehouseById($inv['warehouse_id']);
+
+            if ($warehouse) {
+                if ($context['province'] && $warehouse['latitude'] && $warehouse['longitude']) {
+                    $provinceCoords = $this->getProvinceCoords($context['province']);
+                    if ($provinceCoords) {
+                        $distance = $this->calculateDistance(
+                            $provinceCoords['lat'], $provinceCoords['lon'],
+                            $warehouse['latitude'], $warehouse['longitude']
+                        );
+                    } else {
+                        $distance = $this->estimateDistance($context['province'], $warehouse['province']);
+                    }
+                }
+            }
+
+            $priorityBonus = 0;
+            foreach ($priorityRules as $rule) {
+                $match = $this->checkRuleMatch($rule, $context, $inv);
+                if ($match) {
+                    $action = json_decode($rule['rule_action'] ?? '{}', true);
+                    if (isset($action['set_as_first']) && $action['set_as_first'] && $rule['warehouse_code'] === $inv['warehouse_code']) {
+                        $priorityBonus += 200;
+                    }
+                    if (isset($action['priority_bonus'])) {
+                        $priorityBonus += $action['priority_bonus'];
+                    }
+                }
+            }
+
+            switch ($strategyType) {
+                case 1:
+                    $score = 1000 - ($inv['warehouse_id'] * 10) + $priorityBonus;
+                    break;
+                case 2:
+                    $score = ($distance !== null) ? (2000 - $distance * 2) : 0;
+                    $score += $priorityBonus;
+                    break;
+                case 3:
+                    $score = $inv['available_quantity'] * 2 + $priorityBonus;
+                    break;
+                case 4:
+                    $weights = $rulesConfig['weights'] ?? ['priority' => 40, 'distance' => 30, 'stock' => 20, 'cost' => 10];
+                    $pScore = 1000 - ($inv['warehouse_id'] * 10);
+                    $dScore = ($distance !== null) ? (2000 - $distance * 2) : 0;
+                    $sScore = $inv['available_quantity'] * 2;
+                    $cScore = 500;
+                    $score = ($pScore * $weights['priority'] / 100) +
+                             ($dScore * $weights['distance'] / 100) +
+                             ($sScore * $weights['stock'] / 100) +
+                             ($cScore * $weights['cost'] / 100) +
+                             $priorityBonus;
+                    break;
+                default:
+                    $score = 1000 - ($inv['warehouse_id'] * 10) + $priorityBonus;
+            }
+
+            $scored[] = array_merge($inv, [
+                'score' => $score,
+                'distance' => $distance,
+            ]);
+        }
+
+        usort($scored, function($a, $b) {
+            return $b['score'] - $a['score'];
+        });
+
+        return $scored;
+    }
+
+    private function checkRuleMatch($rule, $context, $inventory) {
+        $condition = json_decode($rule['rule_condition'] ?? '{}', true);
+        $ruleType = $rule['rule_type'] ?? 0;
+
+        switch ($ruleType) {
+            case 1:
+                if (isset($condition['regions']) && $context['province']) {
+                    return in_array($context['province'], $condition['regions']);
+                }
+                return false;
+            case 2:
+                if (isset($condition['goods_tags'])) {
+                    return true;
+                }
+                return false;
+            case 3:
+                if (isset($condition['customer_level']) && $context['customer_level']) {
+                    return in_array($context['customer_level'], $condition['customer_level']);
+                }
+                return false;
+            case 4:
+                if (isset($condition['promotion_tag']) && $context['promotion_tag']) {
+                    return $context['promotion_tag'] === $condition['promotion_tag'] ||
+                           !empty($condition['double11']);
+                }
+                return false;
+            case 5:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private function getProvinceCoords($province) {
+        $coords = [
+            '上海市' => ['lat' => 31.2304, 'lon' => 121.4737],
+            '北京市' => ['lat' => 39.9042, 'lon' => 116.4074],
+            '广东省' => ['lat' => 23.1291, 'lon' => 113.2644],
+            '四川省' => ['lat' => 30.5728, 'lon' => 104.0668],
+            '湖北省' => ['lat' => 30.5928, 'lon' => 114.3055],
+            '浙江省' => ['lat' => 30.2741, 'lon' => 120.1551],
+            '江苏省' => ['lat' => 32.0603, 'lon' => 118.7969],
+            '福建省' => ['lat' => 26.0745, 'lon' => 119.2965],
+            '山东省' => ['lat' => 36.6512, 'lon' => 117.1201],
+            '河南省' => ['lat' => 34.7466, 'lon' => 113.6253],
+            '湖南省' => ['lat' => 27.6104, 'lon' => 111.7088],
+            '安徽省' => ['lat' => 31.8206, 'lon' => 117.2272],
+            '河北省' => ['lat' => 38.0428, 'lon' => 114.5149],
+            '天津市' => ['lat' => 39.0842, 'lon' => 117.2010],
+            '重庆市' => ['lat' => 29.5630, 'lon' => 106.5516],
+            '云南省' => ['lat' => 25.0389, 'lon' => 102.7183],
+            '贵州省' => ['lat' => 26.6470, 'lon' => 106.6302],
+            '广西省' => ['lat' => 22.8170, 'lon' => 108.3665],
+            '海南省' => ['lat' => 20.0174, 'lon' => 110.3492],
+            '江西省' => ['lat' => 27.6104, 'lon' => 115.8919],
+        ];
+        return $coords[$province] ?? null;
+    }
+
+    public function getWarehouses($where = []) {
+        return $this->getData('warehouses', $where);
+    }
+
+    public function getInventories($where = []) {
+        return $this->getInventoriesWithWarehouse($where);
+    }
+
+    public function getStrategies($where = []) {
+        return $this->getData('strategies', $where);
+    }
+
+    public function getPriorityRules($where = []) {
+        return $this->getData('priority_rules', $where);
+    }
+
+    public function saveWarehouse($data) {
+        if ($this->db) {
+            try {
+                if (!empty($data['id'])) {
+                    $this->db->update('warehouses', $data, 'id = :where_id', ['where_id' => $data['id']]);
+                    return $data['id'];
+                } else {
+                    unset($data['id']);
+                    return $this->db->insert('warehouses', $data);
+                }
+            } catch (Exception $e) {}
+        }
+        if (!empty($data['id'])) {
+            foreach ($this->mockData['warehouses'] as &$w) {
+                if ($w['id'] == $data['id']) {
+                    $w = array_merge($w, $data);
+                    return $data['id'];
+                }
+            }
+        } else {
+            $maxId = max(array_column($this->mockData['warehouses'], 'id'));
+            $data['id'] = $maxId + 1;
+            $this->mockData['warehouses'][] = $data;
+            return $data['id'];
+        }
+        return false;
+    }
+
+    public function saveInventory($data) {
+        if ($this->db) {
+            try {
+                if (!empty($data['id'])) {
+                    $this->db->update('warehouse_inventories', $data, 'id = :where_id', ['where_id' => $data['id']]);
+                    return $data['id'];
+                } else {
+                    unset($data['id']);
+                    return $this->db->insert('warehouse_inventories', $data);
+                }
+            } catch (Exception $e) {}
+        }
+        if (!empty($data['id'])) {
+            foreach ($this->mockData['inventories'] as &$inv) {
+                if ($inv['id'] == $data['id']) {
+                    $inv = array_merge($inv, $data);
+                    return $data['id'];
+                }
+            }
+        } else {
+            $maxId = max(array_column($this->mockData['inventories'], 'id'));
+            $data['id'] = $maxId + 1;
+            $this->mockData['inventories'][] = $data;
+            return $data['id'];
+        }
+        return false;
+    }
+
+    public function saveStrategy($data) {
+        if ($this->db) {
+            try {
+                if (!empty($data['id'])) {
+                    $this->db->update('warehouse_routing_strategies', $data, 'id = :where_id', ['where_id' => $data['id']]);
+                    return $data['id'];
+                } else {
+                    unset($data['id']);
+                    return $this->db->insert('warehouse_routing_strategies', $data);
+                }
+            } catch (Exception $e) {}
+        }
+        if (!empty($data['id'])) {
+            foreach ($this->mockData['strategies'] as &$s) {
+                if ($s['id'] == $data['id']) {
+                    $s = array_merge($s, $data);
+                    return $data['id'];
+                }
+            }
+        } else {
+            $maxId = max(array_column($this->mockData['strategies'], 'id'));
+            $data['id'] = $maxId + 1;
+            $this->mockData['strategies'][] = $data;
+            return $data['id'];
+        }
+        return false;
+    }
+
+    public function savePriorityRule($data) {
+        if ($this->db) {
+            try {
+                if (!empty($data['id'])) {
+                    $this->db->update('inventory_priority_rules', $data, 'id = :where_id', ['where_id' => $data['id']]);
+                    return $data['id'];
+                } else {
+                    unset($data['id']);
+                    return $this->db->insert('inventory_priority_rules', $data);
+                }
+            } catch (Exception $e) {}
+        }
+        if (!empty($data['id'])) {
+            foreach ($this->mockData['priority_rules'] as &$r) {
+                if ($r['id'] == $data['id']) {
+                    $r = array_merge($r, $data);
+                    return $data['id'];
+                }
+            }
+        } else {
+            $maxId = max(array_column($this->mockData['priority_rules'], 'id'));
+            $data['id'] = $maxId + 1;
+            $this->mockData['priority_rules'][] = $data;
+            return $data['id'];
+        }
+        return false;
+    }
+
+    public function deleteWarehouse($id) {
+        if ($this->db) {
+            try {
+                return $this->db->delete('warehouses', 'id = :id', ['id' => $id]);
+            } catch (Exception $e) {}
+        }
+        $this->mockData['warehouses'] = array_values(array_filter($this->mockData['warehouses'], function($w) use ($id) {
+            return $w['id'] != $id;
+        }));
+        return true;
+    }
+
+    public function deleteStrategy($id) {
+        if ($this->db) {
+            try {
+                return $this->db->delete('warehouse_routing_strategies', 'id = :id', ['id' => $id]);
+            } catch (Exception $e) {}
+        }
+        $this->mockData['strategies'] = array_values(array_filter($this->mockData['strategies'], function($s) use ($id) {
+            return $s['id'] != $id;
+        }));
+        return true;
+    }
+
+    public function deletePriorityRule($id) {
+        if ($this->db) {
+            try {
+                return $this->db->delete('inventory_priority_rules', 'id = :id', ['id' => $id]);
+            } catch (Exception $e) {}
+        }
+        $this->mockData['priority_rules'] = array_values(array_filter($this->mockData['priority_rules'], function($r) use ($id) {
+            return $r['id'] != $id;
+        }));
+        return true;
+    }
+}
